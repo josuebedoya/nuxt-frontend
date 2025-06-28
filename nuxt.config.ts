@@ -10,6 +10,15 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxt/ui',
-    '@pinia/nuxt'
-  ]
+    '@pinia/nuxt',
+    '@nuxtjs/i18n'
+  ],
+
+  i18n: {
+    strategy: 'prefix_except_default',
+    defaultLocale: 'es',
+    lazy: true,
+    langDir: 'locales',
+    locales: []
+  },
 })
