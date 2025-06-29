@@ -26,5 +26,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()]
+  },
+  runtimeConfig: {
+      apiBase: '', // can be overridden by NUXT_PUBLIC_API_BASE environment variable
   }
 })
