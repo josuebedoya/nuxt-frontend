@@ -3,10 +3,15 @@
 export default defineNuxtRouteMiddleware((to) =>
 {
   const auth = useAuthStore()
-
   // You decide which pages require auth by setting meta.auth = true
   if (!auth.isAuthenticated)
   {
-    return navigateTo({name: 'iuser.login'})
+    const localePath = useLocalePath()
+    return navigateTo({
+      path: localePath('iuser.login'),
+      query: {
+        redirectTo: to.fullPath
+      },
+    })
   }
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {reactive, ref, computed, onMounted} from 'vue'
 
+defineI18nRoute(false)
 const authStore = useAuthStore()
 
 const {t} = useI18n()
@@ -25,6 +26,9 @@ async function onLogin ()
   try
   {
     await authStore.login(auth.email, auth.password)
+    const redirectTo = route.query.redirectTo as string || '/'
+    if (redirectTo && redirectTo.startsWith('/')) navigateTo(redirectTo)
+    else navigateTo('/')
   } catch (error)
   {
     console.error('[LOGIN ERROR]', error)
@@ -77,7 +81,7 @@ async function onLogin ()
         </form>
 
         <div class="mt-2">
-          UserName {{authStore.user?.first_name}}
+          UserName {{ authStore.user?.first_name }}
         </div>
       </div>
     </div>
