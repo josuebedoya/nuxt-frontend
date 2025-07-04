@@ -27,8 +27,9 @@ export default defineNuxtModule({
     // Add middleware
     nuxt.hook('app:resolve', (app) => {
       app.middleware.unshift({
-        name: 'iauth',
-        path: resolve(runtimeDir, 'middleware/iauth')
+        name: 'iuser-auth-can',
+        path: resolve(runtimeDir, 'middleware/auth-can.global'),
+        global: true
       })
     })
     //Extend i18n
