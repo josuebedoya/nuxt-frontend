@@ -2,7 +2,7 @@
 import {reactive, ref, computed, onMounted} from 'vue'
 
 defineI18nRoute(false)
-const authStore = useAuthStore()
+const authStore = useIuserAuthStore()
 
 const {t} = useI18n()
 
@@ -26,9 +26,9 @@ async function onLogin ()
   try
   {
     await authStore.login(auth.email, auth.password)
-    const redirectTo = route.query.redirectTo as string || '/'
+    /*const redirectTo = route.query.redirectTo as string || '/'
     if (redirectTo && redirectTo.startsWith('/')) navigateTo(redirectTo)
-    else navigateTo('/')
+    else navigateTo('/')*/
   } catch (error)
   {
     console.error('[LOGIN ERROR]', error)

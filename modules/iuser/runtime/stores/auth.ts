@@ -1,7 +1,9 @@
 import {defineStore} from 'pinia'
 import type {AuthUser, LoginResponse} from '#iuser/types/auth'
 
-export const useAuthStore = defineStore('auth', () =>
+export const useIuserAuthStore = defineStore(
+  'iuser-auth',
+  () =>
   {
     const user = ref<AuthUser | null>(null)
     const token = ref<string | null>(null)
@@ -18,6 +20,7 @@ export const useAuthStore = defineStore('auth', () =>
 
     function clearAuth ()
     {
+      alert('You have been logged out.')
       user.value = null
       token.value = null
       refreshToken.value = null
@@ -25,19 +28,26 @@ export const useAuthStore = defineStore('auth', () =>
 
     async function login (email: string, password: string)
     {
-      const {data, error} = await useFetch<{ data: LoginResponse }>('/api/iuser/v1/auth/login', {
+      const response = await $fetch<{ data: LoginResponse }>('/api/iuser/v1/auth/login', {
         method: 'POST',
-        body: {attributes: {email, password}}
+        body: {
+          attributes: {email, password}
+        }
       })
 
-      if (error.value) throw createError(error.value)
-      if (data.value) setAuth(data.value.data)
+      setAuth(response.data)
     }
 
     async function logout ()
     {
-      await useFetch('/api/iuser/v1/auth/logout', {method: 'POST'})
+      if (isAuthenticated.value) await $fetch('/api/iuser/v1/auth/logout', {method: 'POST'})
       clearAuth()
+      navigateTo({name: 'iuser.auth-login'})
+    }
+
+    function hasPermission (key: string): boolean
+    {
+      return !!user.value?.permissions?.[key]
     }
 
     return {
@@ -46,7 +56,8 @@ export const useAuthStore = defineStore('auth', () =>
       refreshToken,
       isAuthenticated,
       login,
-      logout
+      logout,
+      hasPermission
     }
   },
   {
