@@ -12,8 +12,8 @@ export const useAuthStore = defineStore('auth', () =>
     function setAuth (data: LoginResponse)
     {
       user.value = data.user
-      token.value = data.token.access_token
-      refreshToken.value = data.token.refresh_token
+      token.value = data.token.accessToken
+      refreshToken.value = data.token.refreshToken
     }
 
     function clearAuth ()
