@@ -1,21 +1,24 @@
 import {defineStore} from 'pinia'
-import type {AuthUser, LoginResponse} from '#iuser/types/auth'
+import type {AuthToken, AuthUser, LoginResponse} from '#iuser/types/auth'
 
 export const useIuserAuthStore = defineStore(
   'iuser-auth',
   () =>
   {
     const user = ref<AuthUser | null>(null)
-    const token = ref<string | null>(null)
-    const refreshToken = ref<string | null>(null)
+    const token = ref<AuthToken | null>(null)
 
+    // Computed property to check if the user is authenticated
     const isAuthenticated = computed(() => !!token.value)
 
-    function setAuth (data: LoginResponse)
+    function setUserdata (data: AuthUser)
     {
-      user.value = data.user
-      token.value = data.token.accessToken
-      refreshToken.value = data.token.refreshToken
+      user.value = data
+    }
+
+    function setToken (data: AuthToken)
+    {
+      token.value = data
     }
 
     function clearAuth ()
@@ -23,19 +26,24 @@ export const useIuserAuthStore = defineStore(
       alert('You have been logged out.')
       user.value = null
       token.value = null
-      refreshToken.value = null
+    }
+
+    async function fetchUser ()
+    {
+      const response = await $fetch<{ data: AuthUser }>('/api/iuser/v1/auth/me', {
+        method: 'GET'
+      })
+      setUserdata(response.data)
     }
 
     async function login (email: string, password: string)
     {
       const response = await $fetch<{ data: LoginResponse }>('/api/iuser/v1/auth/login', {
         method: 'POST',
-        body: {
-          attributes: {email, password}
-        }
+        body: {attributes: {email, password}}
       })
-
-      setAuth(response.data)
+      setUserdata(response.data.user)
+      setToken(response.data.token)
     }
 
     async function logout ()
@@ -50,16 +58,19 @@ export const useIuserAuthStore = defineStore(
       return !!user.value?.permissions?.[key]
     }
 
+
     return {
       user,
       token,
-      refreshToken,
       isAuthenticated,
       login,
       logout,
-      hasPermission
+      hasPermission,
+      fetchUser
     }
   },
   {
-    persist: true
+    persist: [
+      {pick: ['token']}
+    ]
   })

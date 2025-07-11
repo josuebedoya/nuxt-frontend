@@ -1,4 +1,4 @@
-import {addImportsDir, createResolver, defineNuxtModule, extendPages} from '@nuxt/kit'
+import {addImportsDir, createResolver, defineNuxtModule, extendPages, addPlugin} from '@nuxt/kit'
 
 import pagesConfig from './config/pages'
 
@@ -16,10 +16,10 @@ export default defineNuxtModule({
     // Auto-imports
     addImportsDir(resolve(runtimeDir, 'composables'))
     addImportsDir(resolve(runtimeDir, 'stores'))
+    // Plugins (optional)
+    addPlugin(resolve(runtimeDir, 'plugins/fetch-user.client'))
     // Components (optional)
     // addComponentsDir({path: resolve(runtimeDir, 'components') prefix:'Iuser', pathPrefix: false})
-    // Plugins (optional)
-    // addPlugin(resolve(runtimeDir, 'plugins/some.plugin.ts'))
     //Extend pages
     extendPages((pages) => pagesConfig.forEach(
       page => pages.push({...page, file: resolve(page.page)})

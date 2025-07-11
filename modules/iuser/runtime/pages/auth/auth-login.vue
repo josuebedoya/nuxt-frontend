@@ -12,7 +12,7 @@ const route = useRoute()
 
 const auth = reactive({
   email: 'soporte@imaginacolombia.com',
-  password: 'baseImagina123'
+  password: 'NStwI2Z9vLbXejl6'
 })
 const routeQuery = computed(() => route?.query || null)
 
@@ -26,9 +26,9 @@ async function onLogin ()
   try
   {
     await authStore.login(auth.email, auth.password)
-    /*const redirectTo = route.query.redirectTo as string || '/'
+    const redirectTo = route.query.redirectTo as string || '/'
     if (redirectTo && redirectTo.startsWith('/')) navigateTo(redirectTo)
-    else navigateTo('/')*/
+    else navigateTo('/')
   } catch (error)
   {
     console.error('[LOGIN ERROR]', error)
@@ -81,7 +81,7 @@ async function onLogin ()
         </form>
 
         <div class="mt-2">
-          UserName {{ authStore.user?.first_name }}
+          UserName {{ authStore.user?.firstName }}
         </div>
       </div>
     </div>
