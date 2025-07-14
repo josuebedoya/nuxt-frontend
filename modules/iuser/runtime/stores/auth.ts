@@ -7,7 +7,7 @@ export const useIuserAuthStore = defineStore(
   {
     const user = ref<AuthUser | null>(null)
     const token = ref<AuthToken | null>(null)
-
+    const refreshingPromise = ref<Promise<void> | null>(null)
     // Computed property to check if the user is authenticated
     const isAuthenticated = computed(() => !!token.value)
 
@@ -58,6 +58,48 @@ export const useIuserAuthStore = defineStore(
       return !!user.value?.permissions?.[key]
     }
 
+    async function refreshAccessTokenIfNeeded (): Promise<void>
+    {
+      const now = Date.now()
+      const buffer = 60_000 // refresh if < 1 min to expiry
+
+      if (!token.value || !token.value?.refreshToken || !token.value.expiresIn) return
+
+      if (token.value.expiresIn - now > buffer) return // still valid
+
+      // If refresh already in progress, await it
+      if (refreshingPromise.value)
+      {
+        return refreshingPromise.value
+      }
+
+      // Start new refresh
+      refreshingPromise.value = _refreshToken();
+      await refreshingPromise.value
+      refreshingPromise.value = null
+    }
+
+    /**
+     * Actual refresh logic
+     */
+    async function _refreshToken (): Promise<void>
+    {
+      try
+      {
+        if (token.value && token.value.refreshToken)
+        {
+          const response = await $fetch<{ data: AuthToken }>('/api/iuser/v1/auth/refresh-token', {
+            method: 'POST',
+            body: {refreshToken: token.value.refreshToken}
+          })
+          setToken(response.data)
+        }
+      } catch (error)
+      {
+        console.error('[auth] Failed to refresh token', error)
+        //clearAuth()
+      }
+    }
 
     return {
       user,
@@ -66,7 +108,8 @@ export const useIuserAuthStore = defineStore(
       login,
       logout,
       hasPermission,
-      fetchUser
+      fetchUser,
+      refreshAccessTokenIfNeeded
     }
   },
   {

@@ -16,7 +16,12 @@ export default defineNuxtModule({
     // Auto-imports
     addImportsDir(resolve(runtimeDir, 'composables'))
     addImportsDir(resolve(runtimeDir, 'stores'))
-    // Plugins (optional)
+    // Plugins
+    // addPlugin({
+    //   src: resolve(runtimeDir, 'plugins/api-interceptor'),
+    //   mode: 'all',
+    //   order: -10
+    // })
     addPlugin(resolve(runtimeDir, 'plugins/fetch-user.client'))
     // Components (optional)
     // addComponentsDir({path: resolve(runtimeDir, 'components') prefix:'Iuser', pathPrefix: false})
