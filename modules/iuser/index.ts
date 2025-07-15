@@ -16,12 +16,13 @@ export default defineNuxtModule({
     // Auto-imports
     addImportsDir(resolve(runtimeDir, 'composables'))
     addImportsDir(resolve(runtimeDir, 'stores'))
+    addImportsDir(resolve(runtimeDir, 'utils'))
     // Plugins
-    // addPlugin({
-    //   src: resolve(runtimeDir, 'plugins/api-interceptor'),
-    //   mode: 'all',
-    //   order: -10
-    // })
+    addPlugin({
+      src: resolve(runtimeDir, 'plugins/auth-api-fetch'),
+      mode: 'all',
+      order: -10
+    })
     addPlugin(resolve(runtimeDir, 'plugins/fetch-user.client'))
     // Components (optional)
     // addComponentsDir({path: resolve(runtimeDir, 'components') prefix:'Iuser', pathPrefix: false})
@@ -30,7 +31,8 @@ export default defineNuxtModule({
       page => pages.push({...page, file: resolve(page.page)})
     ))
     // Add middleware
-    nuxt.hook('app:resolve', (app) => {
+    nuxt.hook('app:resolve', (app) =>
+    {
       app.middleware.unshift({
         name: 'iuser-auth-can',
         path: resolve(runtimeDir, 'middleware/auth-can.global'),

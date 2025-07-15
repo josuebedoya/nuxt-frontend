@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
-import type {AuthToken, AuthUser, LoginResponse} from '#iuser/types/auth'
+import type {AuthToken, AuthUser} from '#iuser/types/auth'
+import {iuserAuthRepository} from "#iuser/utils/repository";
 
 export const useIuserAuthStore = defineStore(
   'iuser-auth',
@@ -7,7 +8,7 @@ export const useIuserAuthStore = defineStore(
   {
     const user = ref<AuthUser | null>(null)
     const token = ref<AuthToken | null>(null)
-    const refreshingPromise = ref<Promise<void> | null>(null)
+    const refreshingPromise = ref<Promise<{ data: AuthToken }> | null>(null)
     // Computed property to check if the user is authenticated
     const isAuthenticated = computed(() => !!token.value)
 
@@ -30,25 +31,20 @@ export const useIuserAuthStore = defineStore(
 
     async function fetchUser ()
     {
-      const response = await $fetch<{ data: AuthUser }>('/api/iuser/v1/auth/me', {
-        method: 'GET'
-      })
-      setUserdata(response.data)
+      const {data} = await iuserAuthRepository.me()
+      setUserdata(data)
     }
 
     async function login (email: string, password: string)
     {
-      const response = await $fetch<{ data: LoginResponse }>('/api/iuser/v1/auth/login', {
-        method: 'POST',
-        body: {attributes: {email, password}}
-      })
-      setUserdata(response.data.user)
-      setToken(response.data.token)
+      const {data} = await iuserAuthRepository.login(email, password)
+      setUserdata(data.user)
+      setToken(data.token)
     }
 
     async function logout ()
     {
-      if (isAuthenticated.value) await $fetch('/api/iuser/v1/auth/logout', {method: 'POST'})
+      if (isAuthenticated.value) await iuserAuthRepository.logout()
       clearAuth()
       navigateTo({name: 'iuser.auth-login'})
     }
@@ -58,47 +54,20 @@ export const useIuserAuthStore = defineStore(
       return !!user.value?.permissions?.[key]
     }
 
-    async function refreshAccessTokenIfNeeded (): Promise<void>
+    async function refreshAccessTokenIfNeeded (): Promise<{ data: AuthToken } | undefined>
     {
       const now = Date.now()
-      const buffer = 60_000 // refresh if < 1 min to expiry
+      const buffer = 60000 // refresh if < 1 min to expiry
 
-      if (!token.value || !token.value?.refreshToken || !token.value.expiresIn) return
-
-      if (token.value.expiresIn - now > buffer) return // still valid
-
-      // If refresh already in progress, await it
-      if (refreshingPromise.value)
-      {
-        return refreshingPromise.value
-      }
+      if (!token.value || !token.value?.refreshToken || !token.value.expiresAt) return
+      if (token.value.expiresAt - now > buffer) return // still valid
+      if (refreshingPromise.value) return refreshingPromise.value // If refresh already in progress, await it
 
       // Start new refresh
-      refreshingPromise.value = _refreshToken();
-      await refreshingPromise.value
+      refreshingPromise.value = iuserAuthRepository.refreshToken(token.value.refreshToken);
+      const {data} = await refreshingPromise.value
+      setToken(data)
       refreshingPromise.value = null
-    }
-
-    /**
-     * Actual refresh logic
-     */
-    async function _refreshToken (): Promise<void>
-    {
-      try
-      {
-        if (token.value && token.value.refreshToken)
-        {
-          const response = await $fetch<{ data: AuthToken }>('/api/iuser/v1/auth/refresh-token', {
-            method: 'POST',
-            body: {refreshToken: token.value.refreshToken}
-          })
-          setToken(response.data)
-        }
-      } catch (error)
-      {
-        console.error('[auth] Failed to refresh token', error)
-        //clearAuth()
-      }
     }
 
     return {

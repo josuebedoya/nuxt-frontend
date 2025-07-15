@@ -1,8 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
-  devtools: { enabled: true },
+  devtools: {enabled: true},
 
   modules: [
     '@nuxt/eslint',
@@ -30,6 +31,8 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()]
   },
   runtimeConfig: {
-      apiBase: '', // can be overridden by NUXT_PUBLIC_API_BASE environment variable
+    public: {
+      apiBase: ''// can be overridden by NUXT_PUBLIC_API_BASE environment variable
+    }
   }
 })
