@@ -65,9 +65,10 @@ export const useIuserAuthStore = defineStore(
 
       // Start new refresh
       refreshingPromise.value = iuserAuthRepository.refreshToken(token.value.refreshToken);
-      const {data} = await refreshingPromise.value
-      setToken(data)
+      const response = await refreshingPromise.value
+      setToken(response.data)
       refreshingPromise.value = null
+      return response
     }
 
     return {
