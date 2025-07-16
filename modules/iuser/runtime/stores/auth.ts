@@ -19,6 +19,8 @@ export const useIuserAuthStore = defineStore(
 
     function setToken (data: AuthToken)
     {
+      const now = Date.now(); // in milliseconds
+      data.expiresAt = now + data.expiresIn * 1000; // future time in ms
       token.value = data
     }
 
