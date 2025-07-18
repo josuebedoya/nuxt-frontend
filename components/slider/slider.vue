@@ -18,6 +18,8 @@ withDefaults(defineProps<{
       reverse?: boolean,
       centeredItems?: boolean,
       itemsByTransition?: number,
+      moveWithWheel?: boolean,
+      dragFree?: boolean,
 
       //  NAV & DOTS PROPS
       withDots?: boolean,
@@ -39,6 +41,7 @@ withDefaults(defineProps<{
 
       // ITEM PROPS
       classItem?: string
+      classItemActive?: string
       paddingItems?: string,
 
     }>(),
@@ -55,6 +58,8 @@ withDefaults(defineProps<{
       reverse: false,
       centeredItems: false,
       itemsByTransition: 1,
+      moveWithWheel: false,
+      dragFree: false,
 
       //NAVS & DOTS
       withDots: true,
@@ -75,6 +80,7 @@ withDefaults(defineProps<{
 
       // ITEM
       classItem: "",
+      classItemActive: "",
       paddingItems: "p-4"
     });
 
@@ -182,12 +188,18 @@ function play(method?: string = 'autoplay') {
             @select="onSelect"
             :items="items"
             v-slot="{ item, index }"
-            class-names
+            :class-names="{
+              snapped: '',
+              inView: ['active', ...classItemActive.split(' ')]
+            }"
             :loop="loop || reverse"
             :orientation="isVertical ? 'vertical' : 'horizontal'"
-            :dragFree="true"
+            :dragFree="dragFree"
+            :wheelGestures="isVertical && moveWithWheel"
             :align="centeredItems ? 'center' : 'start'"
             :slidesToScroll="itemsByTransition"
+            :inViewThreshold="0.8"
+
             :auto-scroll="autoScroll ? {
               direction: reverse ? 'backward' : 'forward',
               stopOnMouseEnter: pauseOnHover,
@@ -202,6 +214,7 @@ function play(method?: string = 'autoplay') {
               jump: false
             } : false"
             :fade="fade"
+
             :arrows="withNavs"
             :prev="{
             label: navPrevLabel,
@@ -220,11 +233,12 @@ function play(method?: string = 'autoplay') {
             :prev-icon="navPrevIcon.trim()"
             :next-icon="navNextIcon.trim()"
             :dots="withDots"
+
             :ui="{
             root: `slide-content ${ withThumbs && verticalThumbs? 'w-[95%]' : 'w-full'}`,
-            viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto viewport`,
+            viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto mi-viewport-class`,
             container: `slide-container ui-${isVertical ? 'v' : 'h'}-container ${isVertical ? '!items-center' : '!items-start'} justify-start !m-0`,
-            item: `!m-0 !p-0 slide ${classItem} [&:not(.is-snapped)]:opacity-40 transition-all duration-500`,
+            item: `slide ${classItem} !m-0 !p-0`,
             dots: 'dots !static my-3',
             controls: 'controls',
             arrows: 'navs',
@@ -238,6 +252,7 @@ function play(method?: string = 'autoplay') {
         >
           <div
               :ref="setItemRef"
+              class="w-full h-full"
               :class="paddingItems"
           >
 
@@ -258,7 +273,7 @@ function play(method?: string = 'autoplay') {
       >
         <Thumbs
             :items="items"
-            v-slot="{ item }"
+            v-slot="{ thumb }"
             :select="select"
             :is-vertical="verticalThumbs"
             :move-on-over="moveThumbsOnHover"
@@ -267,7 +282,7 @@ function play(method?: string = 'autoplay') {
               play: () => play(autoScroll ? 'autoScroll' : 'autoplay')
             }"
         >
-          <component :componentItem="item" :is="componentThumb"/>
+          <component :item="thumb" :is="componentThumb"/>
         </Thumbs>
       </div>
       <!-- Thumbs End -->
