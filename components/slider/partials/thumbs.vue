@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import {inject} from 'vue'
+import {inject} from "@vue/runtime-core";
 
-withDefaults(defineProps<{
-  items: object[],
-  select: (index: number) => void,
-  isVertical?: boolean,
-  moveOnOver?: boolean,
-  controls: object
-}>(), {
-  isVertical: false,
-  moveOnOver: false
-});
+defineProps({
+  items: {type: Array, required: true},
+  controls: {type: Object, required: true},
+  select: {type: Function, required: true},
 
-const activeIndex = inject('activeIndex')
+  isVertical: {type: Boolean, default: false},
+  moveOnOver: {type: Boolean, default: false},
+})
+
+const activeThumbs = inject<Ref<number[]>>('activeThumbs')
 </script>
 
 <template>
@@ -27,13 +25,13 @@ const activeIndex = inject('activeIndex')
           v-for="(item, index) in items"
           :key="index"
           class="opacity-25 hover:opacity-100 transition-opacity"
-          :class="activeIndex === index &&  'opacity-100'"
+          :class="activeThumbs?.includes(index) && 'opacity-100'"
           @click=" !moveOnOver &&select(index)"
           @mouseenter="moveOnOver && select(index)"
           @mouseover="moveOnOver && controls.stop()"
           @mouseleave="moveOnOver && controls.play()"
       >
-        <slot :item="item" :index="index"/>
+        <slot :thumb="item" :index="index"/>
       </div>
     </div>
   </div>
