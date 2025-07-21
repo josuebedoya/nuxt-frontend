@@ -15,6 +15,7 @@ export interface AuthUser {
 export interface AuthToken {
   tokenType: string
   expiresIn: number
+  expiresAt: number
   accessToken: string
   refreshToken: string
 }
