@@ -53,7 +53,6 @@ const props = defineProps({
 
 const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
-const activeIndex = ref(0)
 const activeIndexes = ref([])
 provide('activeThumbs', activeIndexes) // This to share state active with thumbs
 
@@ -64,55 +63,38 @@ const setItemRef = (el: HTMLElement | null) => {
   }
 }
 
-onMounted(async () => {
-  await nextTick();
+// Controller Section Active
+function emblaController() {
+  const emblaApi = carouselRef.value?.emblaApi
+  if (!emblaApi) return
 
-  // Get tallest Height item (THIS WHERE TE SLIDER IS VERTICAL ORIENTATION)
-  const itemsHeight = itemRefs.value.map(el => el?.offsetHeight);
-  const container = document.querySelector('.ui-v-container');
-
-  if (container) {
-    container.style.height = `${(Math.max(...itemsHeight) + 1)}px`;
-  }
-});
-
-// Synchronize Indexes
-function updateActiveIndexes(index: number) {
-  const itemsActive = carouselRef.value?.emblaApi?.slidesInView()
-  const actives = itemsActive?.map((item: number) => item + props.itemsByTransition)
-
-  if (index !== 0 && actives) {
-    activeIndexes.value = actives
-  } else {
-    activeIndexes.value = Array.from(
-        {length: props.itemsByTransition},
-        (_, i) => i
-    )
-  }
-}
-
-// Prev Item
-function onClickPrev() {
-  activeIndex.value--
-  updateActiveIndexes(activeIndex.value)
-}
-
-// Next Item
-function onClickNext() {
-  activeIndex.value++
-  updateActiveIndexes(activeIndex.value)
+  emblaApi.on('select', () => {
+    requestAnimationFrame(() => {
+      const index = emblaApi.selectedScrollSnap() * props.itemsByTransition
+      onSelect(index)
+    })
+  })
 }
 
 // Go to select item
 function select(index: number) {
-  activeIndex.value = index
-  carouselRef.value?.emblaApi?.scrollTo(index)
-  updateActiveIndexes(index)
+  const slideGroupIndex = Math.floor(index / props.itemsByTransition);
+
+  carouselRef.value?.emblaApi?.scrollTo(slideGroupIndex)
+  onSelect(slideGroupIndex * props.itemsByTransition);
 }
 
 // Fix select item
 function onSelect(index: number) {
-  updateActiveIndexes(index)
+  const total = props.items.length
+  const indexes: number[] = []
+
+  for (let i = 0; i < props.itemsByTransition; i++) {
+    const current = index + i
+    indexes.push(props.loop ? current % total : current)
+  }
+
+  activeIndexes.value = indexes
 }
 
 // Stop Animation
@@ -128,6 +110,21 @@ function play(method?: string = 'autoplay') {
 
   if (pluginMethod) pluginMethod.play()
 }
+
+onMounted(async () => {
+  await nextTick();
+
+  // Use embla Controller
+  emblaController()
+
+  // Get tallest Height item (THIS WHERE TE SLIDER IS VERTICAL ORIENTATION)
+  const itemsHeight = itemRefs.value.map(el => el?.offsetHeight);
+  const container = document.querySelector('.ui-v-container');
+
+  if (container) {
+    container.style.height = `${(Math.max(...itemsHeight) + 1)}px`;
+  }
+});
 
 </script>
 <template>
@@ -154,7 +151,7 @@ function play(method?: string = 'autoplay') {
               ref="carouselRef"
               @select="onSelect"
               :items="items"
-              v-slot="{ item, index }"
+              v-slot="{ item }"
               :class-names="{
               snapped: '',
               inView: ['active', ...classItemActive.split(' ')]
@@ -165,7 +162,7 @@ function play(method?: string = 'autoplay') {
               :wheelGestures="isVertical && moveWithWheel"
               :align="centeredItems ? 'center' : 'start'"
               :slidesToScroll="itemsByTransition"
-              :inViewThreshold="0.8"
+              :inViewThreshold="0.6"
 
               :auto-scroll="autoScroll ? {
               direction: reverse ? 'backward' : 'forward',
@@ -184,19 +181,19 @@ function play(method?: string = 'autoplay') {
 
               :arrows="withNavs"
               :prev="{
-            label: navPrevLabel,
-            color: colorNavs,
-            size: sizeNavs,
-            variant: variantNavs,
-            onClick: onClickPrev
-          }"
+                label: navPrevLabel,
+                color: colorNavs,
+                size: sizeNavs,
+                variant: variantNavs,
+                onClick:emblaController
+              }"
               :next="{
-            label: navNextLabel,
-            color: colorNavs,
-            size: sizeNavs,
-            variant: variantNavs,
-            onClick: onClickNext
-          }"
+                label: navNextLabel,
+                color: colorNavs,
+                size: sizeNavs,
+                variant: variantNavs,
+                onClick:emblaController
+              }"
               :prev-icon="navPrevIcon.trim()"
               :next-icon="navNextIcon.trim()"
               :dots="withDots"
