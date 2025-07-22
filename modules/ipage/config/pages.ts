@@ -1,4 +1,4 @@
-const layout = 'blank'
+const layout = 'master'
 const pages = [
   {
     name: 'ipage.dynamic',
