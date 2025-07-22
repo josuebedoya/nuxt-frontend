@@ -10,7 +10,9 @@ const PageComponent = shallowRef(null)
 const pageSlug = route.params.slug
 
 const {data, error} = await useAsyncData('page', () =>
-    ipagePagesRepository.show(pageSlug)
+    ipagePagesRepository.show(pageSlug, {
+      filter: {field: 'slug'}, include: 'translations'
+    })
 )
 
 if (error.value) {
