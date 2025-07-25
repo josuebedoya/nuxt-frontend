@@ -44,6 +44,9 @@ const props = defineProps({
   verticalThumbs: {type: Boolean, default: false},
   positionThumbs: {type: String, default: "left"},
   moveThumbsOnHover: {type: Boolean, default: false},
+  classThumbItem: {type: String, default: "opacity-25 mx-2"},
+  classThumbItemActive: {type: String, default: "opacity-100"},
+  moveThumbsOnHover: {type: Boolean, default: false},
 
   // ITEM
   classItem: {type: String, default: ""},
