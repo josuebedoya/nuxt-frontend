@@ -8,6 +8,9 @@ defineProps({
 
   isVertical: {type: Boolean, default: false},
   moveOnOver: {type: Boolean, default: false},
+
+  itemClass: {type: String, default: ""},
+  itemActiveClass: {type: String, default: ""}
 })
 
 const activeThumbs = inject<Ref<number[]>>('activeThumbs')
@@ -24,8 +27,11 @@ const activeThumbs = inject<Ref<number[]>>('activeThumbs')
       <div
           v-for="(item, index) in items"
           :key="index"
-          class="opacity-25 hover:opacity-100 transition-opacity"
-          :class="activeThumbs?.includes(index) && 'opacity-100'"
+          class="hover:opacity-100 transition-opacity"
+          :class="[
+              itemClass,
+              activeThumbs?.includes(index) && itemActiveClass
+              ]"
           @click=" !moveOnOver &&select(index)"
           @mouseenter="moveOnOver && select(index)"
           @mouseover="moveOnOver && controls.stop()"
