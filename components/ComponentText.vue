@@ -87,21 +87,11 @@
     default: '',
   },
 });
-
-onMounted(() => {
-  console.log('🔍 onMounted text:', props.text)
-})
-
-watch(() => props.text, (nuevo) => {
-  console.log('👀 Cambió text:', nuevo)
-})
-
 </script>
 
 
 <template>
-  
-  <component :is="typeTag" v-html="text"
+  <component :is="typeTag"
    :class="[
     classDinamic,
     color, 
@@ -121,6 +111,8 @@ watch(() => props.text, (nuevo) => {
     overflow, 
     wordBreak, 
     textIndent]">  
+      <span v-if="text" v-html="text" />
+      <slot v-else />
   </component>
   
 </template>

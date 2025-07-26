@@ -5,12 +5,13 @@
       
       <componentText
         typeTag="h2"
-        text="<p>  Holaaaasssstvvvsdsssakaadt </p>"
+        text="<p>  Holaaa asssstvvvsdss ddsakaadt </p>"
         class="text-lg font-semibold flex-1"
         color="text-gray-800 "
         background="bg-gray-100 "
       > 
-      <div>hola hp</div>
+      
+    <div>Lo que yo quiera</div>
       </componentText>
     </div>
 

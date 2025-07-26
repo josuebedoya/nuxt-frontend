@@ -8,7 +8,9 @@
     </h1>
     <UButton block color="neutral" variant="soft" label="Logout" @click="authStore.logout"/> -->
 
+    
     <ItemList/>
+    
   </div>
 </template>
 
