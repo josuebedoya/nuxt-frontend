@@ -1,57 +1,63 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import Thumbs from './partials/thumbs.vue'
+import CsTailwind from "~/components/slider/config";
+
 
 const props = defineProps({
-  isActive: {type: Boolean, default: true},
-  id: {type: String, default: ""},
-  component: {type: null, required: true},
-  componentThumb: {type: null, required: true},
-  items: {type: Array, required: true},
+ isActive: {type: Boolean, default: true},
+ id: {type: String, default: ""},
+ component: {type: null, required: true},
+ componentThumb: {type: null, required: false},
+ items: {type: Array, required: true},
+ breakPoint: {type: Object, required: false, default: {0: 1, "md": 2, "lg": 3, "xl": 4}},
 
-  // BEHAVIOR CAROUSEL
-  autoPlay: {type: Boolean, default: true},
-  autoScroll: {type: Boolean, default: false},
-  fade: {type: Boolean, default: false},
-  delay: {type: Number, default: 3000},
-  pauseOnHover: {type: Boolean, default: false},
-  loop: {type: Boolean, default: false},
-  isVertical: {type: Boolean, default: false},
-  reverse: {type: Boolean, default: false},
-  centeredItems: {type: Boolean, default: false},
-  itemsByTransition: {type: Number, default: 1},
-  moveWithWheel: {type: Boolean, default: false},
-  dragFree: {type: Boolean, default: false},
+ // BEHAVIOR CAROUSEL
+ autoPlay: {type: Boolean, default: true},
+ autoScroll: {type: Boolean, default: false},
+ fade: {type: Boolean, default: false},
+ delay: {type: Number, default: 3000},
+ pauseOnHover: {type: Boolean, default: false},
+ loop: {type: Boolean, default: false},
+ isVertical: {type: Boolean, default: false},
+ reverse: {type: Boolean, default: false},
+ centeredItems: {type: Boolean, default: false},
+ itemsByTransition: {type: Number, default: 1},
+ moveWithWheel: {type: Boolean, default: false},
+ dragFree: {type: Boolean, default: false},
 
-  // CONTAINER
-  activeContainer: {type: Boolean, default: false},
-  sizeContainer: {type: String, default: '2xl:container'},
+ // CONTAINER
+ activeContainer: {type: Boolean, default: false},
+ sizeContainer: {type: String, default: '2xl:container'},
 
-  //NAVS & DOTS
-  withDots: {type: Boolean, default: true},
-  withNavs: {type: Boolean, default: true},
-  colorNavs: {type: String, default: "primary"},
-  sizeNavs: {type: String, default: "md"},
-  variantNavs: {type: String, default: "ghost"},
-  navPrevIcon: {type: String, default: "material-symbols:arrow-back-ios-new"},
-  navNextIcon: {type: String, default: "material-symbols:arrow-forward-ios-rounded"},
-  navPrevLabel: {type: String, default: ""},
-  navNextLabel: {type: String, default: ""},
-  classNavs: {type: String, default: ""},
+ //NAVS & DOTS
+ withDots: {type: Boolean, default: true},
+ withNavs: {type: Boolean, default: true},
+ colorNavs: {type: String, default: "primary"},
+ sizeNavs: {type: String, default: "md"},
+ variantNavs: {type: String, default: "ghost"},
+ navPrevIcon: {type: String, default: "material-symbols:arrow-back-ios-new"},
+ navNextIcon: {type: String, default: "material-symbols:arrow-forward-ios-rounded"},
+ navPrevLabel: {type: String, default: ""},
+ navNextLabel: {type: String, default: ""},
+ classNavs: {type: String, default: ""},
 
-  // THUMBS
-  withThumbs: {type: Boolean, default: false},
-  verticalThumbs: {type: Boolean, default: false},
-  positionThumbs: {type: String, default: "left"},
-  moveThumbsOnHover: {type: Boolean, default: false},
-  classThumbItem: {type: String, default: "opacity-25 mx-2"},
-  classThumbItemActive: {type: String, default: "opacity-100"},
-  moveThumbsOnHover: {type: Boolean, default: false},
+ // THUMBS
+ withThumbs: {type: Boolean, default: false},
+ thumbsVertical: {type: Boolean, default: false},
+ positionThumbs: {type: String, default: "left"},
+ moveThumbsOnHover: {type: Boolean, default: false},
+ thumbsItemClass: {type: String, default: "opacity-25"},
+ thumbsItemClassActive: {type: String, default: "opacity-100"},
+ thumbsBreakpoint: {type: Object, default: {0: 2, "md": 3, "xl": 4}},
+ thumbsItemPadding: {type: String, default: "p-2"},
+ withDotsInThumbs: {type: Boolean, default: false},
+ withNavsInThumbs: {type: Boolean, default: false},
 
-  // ITEM
-  classItem: {type: String, default: ""},
-  classItemActive: {type: String, default: ""},
-  paddingItems: {type: String, default: "p-4"},
+ // ITEM
+ classItem: {type: String, default: ""},
+ classItemActive: {type: String, default: ""},
+ paddingItems: {type: String, default: "p-4"},
 })
 
 const carouselRef = ref(null)
@@ -61,199 +67,204 @@ provide('activeThumbs', activeIndexes) // This to share state active with thumbs
 
 // Update items ref
 const setItemRef = (el: HTMLElement | null) => {
-  if (el && !itemRefs.value.includes(el)) {
-    itemRefs.value.push(el)
-  }
+ if (el && !itemRefs.value.includes(el)) {
+  itemRefs.value.push(el)
+ }
 }
 
 // Controller Section Active
 function emblaController() {
-  const emblaApi = carouselRef.value?.emblaApi
-  if (!emblaApi) return
+ const emblaApi = carouselRef.value?.emblaApi
+ if (!emblaApi) return
 
-  emblaApi.on('select', () => {
-    requestAnimationFrame(() => {
-      const index = emblaApi.selectedScrollSnap() * props.itemsByTransition
-      onSelect(index)
-    })
+ emblaApi.on('select', () => {
+  requestAnimationFrame(() => {
+   const index = emblaApi.selectedScrollSnap() * props.itemsByTransition
+   onSelect(index)
   })
+ })
 }
 
 // Go to select item
 function select(index: number) {
-  const slideGroupIndex = Math.floor(index / props.itemsByTransition);
+ const slideGroupIndex = Math.floor(index / props.itemsByTransition);
 
-  carouselRef.value?.emblaApi?.scrollTo(slideGroupIndex)
-  onSelect(slideGroupIndex * props.itemsByTransition);
+ carouselRef.value?.emblaApi?.scrollTo(slideGroupIndex)
+ onSelect(slideGroupIndex * props.itemsByTransition);
 }
 
 // Fix select item
 function onSelect(index: number) {
-  const total = props.items.length
-  const indexes: number[] = []
+ const total = props.items.length
+ const indexes: number[] = []
 
-  for (let i = 0; i < props.itemsByTransition; i++) {
-    const current = index + i
-    indexes.push(props.loop ? current % total : current)
-  }
+ for (let i = 0; i < props.itemsByTransition; i++) {
+  const current = index + i
+  indexes.push(props.loop ? current % total : current)
+ }
 
-  activeIndexes.value = indexes
+ activeIndexes.value = indexes
 }
 
 // Stop Animation
 function stop(method?: string = 'autoplay') {
-  const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
+ const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
 
-  if (pluginMethod) pluginMethod.stop()
+ if (pluginMethod) pluginMethod.stop()
 }
 
 // Play Animation
 function play(method?: string = 'autoplay') {
-  const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
+ const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
 
-  if (pluginMethod) pluginMethod.play()
+ if (pluginMethod) pluginMethod.play()
 }
 
 onMounted(async () => {
-  await nextTick();
+ await nextTick();
 
-  // Use embla Controller
-  emblaController()
+ // Use embla Controller
+ emblaController()
 
-  // Get tallest Height item (THIS WHERE TE SLIDER IS VERTICAL ORIENTATION)
-  const itemsHeight = itemRefs.value.map(el => el?.offsetHeight);
-  const container = document.querySelector('.ui-v-container');
+ // Get tallest Height item (THIS WHERE TE SLIDER IS VERTICAL ORIENTATION)
+ const itemsHeight = itemRefs.value.map(el => el?.offsetHeight);
+ const container = document.querySelector('.ui-v-container');
 
-  if (container) {
-    container.style.height = `${(Math.max(...itemsHeight) + 1)}px`;
-  }
+ if (container) {
+  container.style.height = `${(Math.max(...itemsHeight) + 1)}px`;
+ }
 });
 
 </script>
 <template>
-  <section :id="id" class="w-full h-auto">
-    <div :class="activeContainer && sizeContainer">
-      <div
-          :class="[
+ <section :id="id" class="w-full h-auto">
+  <div :class="activeContainer && sizeContainer">
+   <div
+     :class="[
         `carousel${id}`,
         'flex gap-8 w-full items-center',
-        verticalThumbs ? 'flex-row' : 'flex-col',
+        thumbsVertical ? 'flex-row' : 'flex-col',
         isVertical ? 'justify-center' : 'justify-between'
-      ]"
-      >
-        <!-- Main Carousel -->
-        <div
-            :class="[
+     ]"
+   >
+    <!-- Main Carousel -->
+    <div
+      :class="[
           'primary-carousel grow',
-          withThumbs && verticalThumbs ? 'w-[85%]' : 'w-full',
+          withThumbs && thumbsVertical ? 'w-[85%]' : 'w-full',
           isVertical ? 'max-w-max':'max-w-full'
-        ]"
-        >
-          <UCarousel
-              :active="isActive"
-              ref="carouselRef"
-              @select="onSelect"
-              :items="items"
-              v-slot="{ item }"
-              :class-names="{
+      ]"
+    >
+     <UCarousel
+       :active="isActive"
+       ref="carouselRef"
+       @select="onSelect"
+       :items="items"
+       v-slot="{ item }"
+       :class-names="{
               snapped: '',
               inView: ['active', ...classItemActive.split(' ')]
-            }"
-              :loop="loop || reverse"
-              :orientation="isVertical ? 'vertical' : 'horizontal'"
-              :dragFree="dragFree"
-              :wheelGestures="isVertical && moveWithWheel"
-              :align="centeredItems ? 'center' : 'start'"
-              :slidesToScroll="itemsByTransition"
-              :inViewThreshold="0.6"
+       }"
+       :loop="loop || reverse"
+       :orientation="isVertical ? 'vertical' : 'horizontal'"
+       :dragFree="dragFree"
+       :wheelGestures="isVertical && moveWithWheel"
+       :align="centeredItems ? 'center' : 'start'"
+       :slidesToScroll="itemsByTransition"
+       :inViewThreshold="0.6"
 
-              :auto-scroll="autoScroll ? {
+       :auto-scroll="autoScroll ? {
               direction: reverse ? 'backward' : 'forward',
               stopOnMouseEnter: pauseOnHover,
               stopOnInteraction: !pauseOnHover,
               isPlaying: pauseOnHover
-            } : false"
-              :autoplay="autoPlay &&  !autoScroll ? {
+       } : false"
+       :autoplay="autoPlay &&  !autoScroll ? {
               direction: reverse ? 'backward' : 'forward',
               delay,
               stopOnMouseEnter: pauseOnHover,
               stopOnInteraction: !pauseOnHover,
               jump: false
-            } : false"
-              :fade="fade"
+       } : false"
+       :fade="fade"
 
-              :arrows="withNavs"
-              :prev="{
+       :arrows="withNavs"
+       :prev="{
                 label: navPrevLabel,
                 color: colorNavs,
                 size: sizeNavs,
                 variant: variantNavs,
                 onClick:emblaController
-              }"
-              :next="{
+       }"
+       :next="{
                 label: navNextLabel,
                 color: colorNavs,
                 size: sizeNavs,
                 variant: variantNavs,
                 onClick:emblaController
-              }"
-              :prev-icon="navPrevIcon.trim()"
-              :next-icon="navNextIcon.trim()"
-              :dots="withDots"
+       }"
+       :prev-icon="navPrevIcon.trim()"
+       :next-icon="navNextIcon.trim()"
+       :dots="withDots"
 
-              :ui="{
-            root: `slide-content ${ withThumbs && verticalThumbs? 'w-[95%]' : 'w-full'}`,
+       :ui="{
+            root: `slide-content ${ withThumbs && thumbsVertical? 'w-[95%]' : 'w-full'}`,
             viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto viewport`,
             container: `slide-container ui-${isVertical ? 'v' : 'h'}-container ${isVertical ? '!items-center' : '!items-start'} justify-start !m-0`,
-            item: `slide ${classItem} !m-0 !p-0`,
+            item: `slide ${classItem} !m-0 !p-0 ${[CsTailwind(breakPoint || {}).join(' ')]}`,
             dots: 'dots !static my-3',
             controls: 'controls',
             arrows: 'navs',
             prev: `cursor-pointer ${classNavs}`,
             next: `cursor-pointer flex flex-row-reverse ${classNavs}`
-          }"
+       }"
 
-              :breakpoints="{
+       :breakpoints="{
+       500:{slidesToScroll: 1}
+       }"
+     >
+      <div
+        :ref="setItemRef"
+        class="w-full h-full"
+        :class="paddingItems"
+      >
 
-            }"
-          >
-            <div
-                :ref="setItemRef"
-                class="w-full h-full"
-                :class="paddingItems"
-            >
+       <component :componentItem="item" :is="component"/>
 
-              <component :componentItem="item" :is="component"/>
+      </div>
+     </UCarousel>
+    </div>
+    <!-- Main Carousel  End-->
 
-            </div>
-          </UCarousel>
-        </div>
-        <!-- Main Carousel  End-->
-
-        <!-- Thumbs -->
-        <div
-            v-if="withThumbs"
-            :class="[
+    <!-- Thumbs -->
+    <div
+      v-if="withThumbs"
+      :class="[
           'thumbs-carousel shrink-0',
-          verticalThumbs ? 'flex flex-col gap-2 w-[15%] max-w-[10%]' : 'w-full flex justify-center'
+          thumbsVertical ? 'flex flex-col gap-2 w-[15%] max-w-[10%]' : 'w-full flex justify-center'
         ]"
-        >
-          <Thumbs
-              :items="items"
-              v-slot="{ thumb }"
-              :select="select"
-              :is-vertical="verticalThumbs"
-              :move-on-over="moveThumbsOnHover"
-              :controls="{
+    >
+     <Thumbs
+       :items="items"
+       :component-thumb="componentThumb"
+       v-slot="{ thumb }"
+       :select="select"
+       :is-vertical="thumbsVertical"
+       :move-on-over="moveThumbsOnHover"
+       :item-class="thumbsItemClass"
+       :item-active-class="thumbsItemClassActive"
+       :breakpoint="thumbsBreakpoint"
+       :item-padding="thumbsItemPadding"
+       :controls="{
               stop: () => stop(autoScroll ? 'autoScroll' : 'autoplay'),
               play: () => play(autoScroll ? 'autoScroll' : 'autoplay')
-            }"
-          >
-            <component :item="thumb" :is="componentThumb"/>
-          </Thumbs>
-        </div>
-        <!-- Thumbs End -->
-      </div>
+       }"
+     >
+      <!--      <component :item="thumb" :is="componentThumb"/>-->
+     </Thumbs>
     </div>
-  </section>
+    <!-- Thumbs End -->
+   </div>
+  </div>
+ </section>
 </template>
