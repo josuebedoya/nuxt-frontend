@@ -20,6 +20,7 @@ const props = defineProps({
  autoScroll: {type: Boolean, default: false},
  fade: {type: Boolean, default: false},
  delay: {type: Number, default: 3000},
+ speed: {type: Number, default: 1},
  pauseOnHover: {type: Boolean, default: false},
  loop: {type: Boolean, default: false},
  isVertical: {type: Boolean, default: false},
@@ -47,16 +48,10 @@ const props = defineProps({
 
  // THUMBS
  withThumbs: {type: Boolean, default: false},
- thumbsVertical: {type: Boolean, default: false},
+ thumbsProps: {type: Object, default: {}},
  positionThumbs: {type: String, default: "left"},
  moveThumbsOnHover: {type: Boolean, default: false},
- thumbsItemClass: {type: String, default: "opacity-25"},
- thumbsItemClassActive: {type: String, default: "opacity-100"},
- thumbsBreakpoint: {type: Object, default: {0: 2, "md": 3, "xl": 4}},
- thumbsItemPadding: {type: String, default: "p-2"},
- withDotsInThumbs: {type: Boolean, default: false},
- withNavsInThumbs: {type: Boolean, default: false},
- moveWithWheelThumbs: {type: Boolean, default: true},
+
 
  // ITEM
  classItem: {type: String, default: ""},
@@ -67,9 +62,10 @@ const props = defineProps({
 const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
 const activeIndexes = ref([])
+const thumbsVertical = ref(props.thumbsProps?.isVertical);
 provide('activeThumbs', activeIndexes) // This to share state active with thumbs
 
-// Update items ref
+// Update item ref
 const setItemRef = (el: HTMLElement | null) => {
  if (el && !itemRefs.value.includes(el)) {
   itemRefs.value.push(el)
@@ -196,7 +192,8 @@ onMounted(async () => {
               direction: reverse ? 'backward' : 'forward',
               stopOnMouseEnter: pauseOnHover,
               stopOnInteraction: !pauseOnHover,
-              isPlaying: pauseOnHover
+              isPlaying: pauseOnHover,
+              speed: speed
        } : false"
        :autoplay="autoPlay &&  !autoScroll ? {
               direction: reverse ? 'backward' : 'forward',
@@ -248,7 +245,6 @@ onMounted(async () => {
         class="w-full h-full"
         :class="paddingItems"
       >
-
        <component :componentItem="item" :is="component"/>
 
       </div>
@@ -266,22 +262,14 @@ onMounted(async () => {
     >
      <Thumbs
        :items="items"
-       :component-thumb="componentThumb"
-       v-slot="{ thumb }"
+       :component="componentThumb"
        :select="select"
-       :is-vertical="thumbsVertical"
-       :move-on-over="moveThumbsOnHover"
-       :item-class="thumbsItemClass"
-       :item-active-class="thumbsItemClassActive"
-       :breakpoint="thumbsBreakpoint"
-       :item-padding="thumbsItemPadding"
        :controls="{
               stop: () => stop(autoScroll ? 'autoScroll' : 'autoplay'),
               play: () => play(autoScroll ? 'autoScroll' : 'autoplay')
        }"
-       :with-navs="withNavsInThumbs"
-       :with-dots="withDotsInThumbs"
-       :move-with-wheel="moveWithWheelThumbs"
+       :move-on-over="moveThumbsOnHover"
+       :thumbsProps="thumbsProps"
      />
     </div>
     <!-- Thumbs End -->
