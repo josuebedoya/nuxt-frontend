@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import Thumbs from './partials/thumbs.vue'
-import CsTailwind from "~/components/slider/config";
-
+import CsTailwind from "~/utils/csTalwind";
 
 const props = defineProps({
  isActive: {type: Boolean, default: true},
@@ -10,6 +9,10 @@ const props = defineProps({
  component: {type: null, required: true},
  componentThumb: {type: null, required: false},
  items: {type: Array, required: true},
+ rootClass: {type: String, default: ""},
+ containerClass: {type: String, default: ""},
+ viewportClass: {type: String, default: ""},
+ autoDimensionedViewport: {type: Boolean, default: false},
  breakPoint: {type: Object, required: false, default: {0: 1, "md": 2, "lg": 3, "xl": 4}},
 
  // BEHAVIOR CAROUSEL
@@ -53,6 +56,7 @@ const props = defineProps({
  thumbsItemPadding: {type: String, default: "p-2"},
  withDotsInThumbs: {type: Boolean, default: false},
  withNavsInThumbs: {type: Boolean, default: false},
+ moveWithWheelThumbs: {type: Boolean, default: true},
 
  // ITEM
  classItem: {type: String, default: ""},
@@ -120,19 +124,35 @@ function play(method?: string = 'autoplay') {
  if (pluginMethod) pluginMethod.play()
 }
 
+// Dimensions container (THIS FROM USE THUMBS)
+function dimensionContainer() {
+ const isVertical = props.isVertical;
+ const numItems = Object.values(props.breakPoint).slice(-1)[0];
+ const viewport = carouselRef.value?.emblaRef;
+ const container = viewport?.childNodes[0] ?? null;
+ const measurements = itemRefs.value.map(el => (isVertical ? el?.offsetHeight : el?.offsetWidth));
+ const largerSize = Math.max(...measurements ?? []);
+ const size = (largerSize + 2) * numItems;
+
+ if ((viewport && container) && (props.autoDimensionedViewport || isVertical)) {
+  if (isVertical) {
+   viewport.style.maxHeight = `${size}px`;
+   container.style.maxHeight = `${size}px`;
+  } else {
+   viewport.style.maxWidth = `${size}px`;
+   container.style.maxWidth = `${size}px`;
+  }
+ }
+}
+
 onMounted(async () => {
  await nextTick();
 
  // Use embla Controller
- emblaController()
+ emblaController();
 
- // Get tallest Height item (THIS WHERE TE SLIDER IS VERTICAL ORIENTATION)
- const itemsHeight = itemRefs.value.map(el => el?.offsetHeight);
- const container = document.querySelector('.ui-v-container');
-
- if (container) {
-  container.style.height = `${(Math.max(...itemsHeight) + 1)}px`;
- }
+ // Dimensioned container
+ dimensionContainer();
 });
 
 </script>
@@ -143,8 +163,7 @@ onMounted(async () => {
      :class="[
         `carousel${id}`,
         'flex gap-8 w-full items-center',
-        thumbsVertical ? 'flex-row' : 'flex-col',
-        isVertical ? 'justify-center' : 'justify-between'
+        thumbsVertical ? 'flex-row justify-between' : 'flex-col justify-center',
      ]"
    >
     <!-- Main Carousel -->
@@ -208,10 +227,10 @@ onMounted(async () => {
        :dots="withDots"
 
        :ui="{
-            root: `slide-content ${ withThumbs && thumbsVertical? 'w-[95%]' : 'w-full'}`,
-            viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto viewport`,
-            container: `slide-container ui-${isVertical ? 'v' : 'h'}-container ${isVertical ? '!items-center' : '!items-start'} justify-start !m-0`,
-            item: `slide ${classItem} !m-0 !p-0 ${[CsTailwind(breakPoint || {}).join(' ')]}`,
+            root: `slide-content ${ withThumbs && thumbsVertical? 'max-w-[95%]' : 'w-full'} ${rootClass}`,
+            viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto viewport ${viewportClass}`,
+            container: `slide-container ui-${isVertical ? 'v' : 'h'}-container ${isVertical ? '!items-center' : '!items-start'} justify-start !m-0 ${containerClass}`,
+            item: `slide ${classItem} !m-0 !p-0 ${[CsTailwind(breakPoint || {}, 'basis-1/').join(' ')]}`,
             dots: 'dots !static my-3',
             controls: 'controls',
             arrows: 'navs',
@@ -220,7 +239,8 @@ onMounted(async () => {
        }"
 
        :breakpoints="{
-       500:{slidesToScroll: 1}
+        768: {slidesToScroll: 2},
+        500:{slidesToScroll: 1}
        }"
      >
       <div
@@ -240,8 +260,8 @@ onMounted(async () => {
     <div
       v-if="withThumbs"
       :class="[
-          'thumbs-carousel shrink-0',
-          thumbsVertical ? 'flex flex-col gap-2 w-[15%] max-w-[10%]' : 'w-full flex justify-center'
+          'thumbs-carousel',
+          thumbsVertical ? 'flex flex-col gap-2 max-w-[15%]' : 'w-full flex justify-center'
         ]"
     >
      <Thumbs
@@ -259,9 +279,10 @@ onMounted(async () => {
               stop: () => stop(autoScroll ? 'autoScroll' : 'autoplay'),
               play: () => play(autoScroll ? 'autoScroll' : 'autoplay')
        }"
-     >
-      <!--      <component :item="thumb" :is="componentThumb"/>-->
-     </Thumbs>
+       :with-navs="withNavsInThumbs"
+       :with-dots="withDotsInThumbs"
+       :move-with-wheel="moveWithWheelThumbs"
+     />
     </div>
     <!-- Thumbs End -->
    </div>
