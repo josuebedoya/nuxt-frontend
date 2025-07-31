@@ -22,7 +22,10 @@ const sliderProps = {
  pauseOnHover: props.thumbsProps?.pauseOnHover ?? true,
  dragFree: props.thumbsProps?.dragFree ?? true,
  moveWithWheel: props.thumbsProps?.moveWithWheel ?? true,
+ withDots: props.thumbsProps?.withDots ?? false,
+ withNavs: props.thumbsProps?.withNavs ?? true,
  speed: props.thumbsProps?.speed ?? 0.6,
+ navPosition: props.thumbsProps?.navPosition ?? 'sides',
  ...props.thumbsProps
 }
 </script>
