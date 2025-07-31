@@ -34,6 +34,7 @@ const {
   hoverColor,
   transition,
   textWrap,
+  order,
   icon,
 } = props.configComponentText || {};
 
@@ -70,7 +71,14 @@ const additionalStyles = computed(() =>
 <template>
   <component
     :is="typeTag"
-    :class="[typography, spacing, behavior, additionalStyles, classDinamic]"
+    :class="[
+      order,
+      typography,
+      spacing,
+      behavior,
+      additionalStyles,
+      classDinamic,
+    ]"
   >
     <span v-if="text" v-html="text" />
     <slot name="componentText" v-else />
