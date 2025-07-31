@@ -1,6 +1,4 @@
 <script setup>
-import { textChangeRangeIsUnchanged } from "typescript";
-
 const data = {
   labels: {
     titl3e: "20-12-2050",
@@ -20,9 +18,7 @@ const data = {
   image:
     "https://persistent.imagedescriber.online/image-describer-examples/000.jpg",
 
-  button: {
-    label: "Click Me",
-  },
+  button: "Click Me",
 };
 
 const dataStyle = {
@@ -35,12 +31,13 @@ const dataStyle = {
       fontWeight: "font-semibold",
     },
     title: {
-      color: "text-gray-900",
+      color: "text-blue-900",
       background: "bg-red-200",
       size: "text-lg",
       fontWeight: "font-semibold",
     },
     description66: {
+      typeTag: "s",
       color: "text-gray-900",
       background: "bg-gray-200",
       size: "text-lg",

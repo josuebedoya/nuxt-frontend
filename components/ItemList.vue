@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 const props = defineProps({
   item: {
@@ -53,7 +52,6 @@ const spacing = computed(() => {
 
 function deepMerge(obj1: any, obj2: any): any {
   const result: any = { ...obj1 };
-
   Object.entries(obj2 || {}).forEach(([key, value]) => {
     if (
       value &&
@@ -66,13 +64,12 @@ function deepMerge(obj1: any, obj2: any): any {
       result[key] = value;
     }
   });
-
   return result;
 }
 
 const additionalStyles = deepMerge(props.item, props.styleItem || {});
 
-console.log(additionalStyles["labels"]);
+console.log(additionalStyles["labels"].description2);
 </script>
 
 <template>
@@ -87,19 +84,14 @@ console.log(additionalStyles["labels"]);
       </div>
 
       <div class="content flex-1">
-        <componentText
+        <ComponentText
           v-for="(label, index) in item.labels"
           :key="index"
-          :typeTag="additionalStyles['labels']['typeTag'] || 'p'"
-          :text="label.text"
-          class="font-semibold flex-1"
-          color="text-gray-900 "
-          background="bg-red-200"
-          size="text-[15px] md:text-[30px]"
-          padding="py-4 px-6"
-        >
-        </componentText>
-
+          :configComponentText="{
+            ...additionalStyles.labels?.[index],
+            text: label,
+          }"
+        />
         <UButton> Ver Mas </UButton>
       </div>
     </div>
