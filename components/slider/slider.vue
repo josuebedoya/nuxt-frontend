@@ -164,11 +164,13 @@ function dimensionContainer(): any {
  const isVertical = props.isVertical
  const numItems = Object.values(props.breakPoint).slice(-1)[0];
  const viewport = carouselRef.value?.emblaRef
+ const emblaApi = carouselRef.value?.emblaApi
+ const itemsInView = emblaApi?.slidesInView();
  const container = viewport?.childNodes[0] ?? null
  const measurements = itemRefs.value.map(el => (isVertical ? el?.offsetHeight : el?.offsetWidth))
+ console.info(measurements)
  const largerSize = Math.max(...measurements ?? [])
- const size = (largerSize + 2) * numItems
-
+ const size = (largerSize + 2) * (typeof numItems === 'number' ? numItems : (itemsInView.length === 0 ? 1 : itemsInView.length))
  if ((viewport && container) && (props.autoDimensionedViewport || isVertical)) {
   if (isVertical) {
    viewport.style.maxHeight = `${size}px`
