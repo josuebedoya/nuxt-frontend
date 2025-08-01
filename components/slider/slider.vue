@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
+import {useWindowSize} from "@vueuse/core";
 import Thumbs from './partials/thumbs.vue'
 import CsTailwind from "~/utils/csTalwind"
 import Dots from "./partials/dots.vue";
@@ -86,7 +87,8 @@ provide('activeThumbs', activeIndexes) // This to share state active with thumbs
 provide('selectedIndex', selectedIndex) // This to share state active Dot
 provide('canScrollNext', canScrollNext) // This to share scroll possibility with navs
 provide('canScrollPrev', canScrollPrev) // This to share scroll possibility with navs
-
+const {width} = useWindowSize();
+const isMobile = computed(() => width.value <= 768);
 // Update item ref
 const setItemRef = (el: HTMLElement | null): any => {
  if (el && !itemRefs.value.includes(el)) {
@@ -194,8 +196,6 @@ function dimensionContainer(): any {
  }
 }
 
-const isIndividualNavs = computed(() => props.navsPosition === 'sides' || props.navsPosition === 'vertical')
-
 /* Classes Component */
 // Container
 const classContainer = computed(() => {
@@ -210,8 +210,9 @@ const carouselClass = computed(() => {
 const primaryCarouselClass = computed(() => {
  const isVertical = props.navsPosition === 'vertical';
  return [
-  'primary-carousel mx-auto max-w-max',
+  'primary-carousel mx-auto max-w-max my-4',
   isIndividualNavs.value && 'flex justify-center items-center',
+  isVertical && 'flex-col',
   props.autoDimensionedViewport && 'max-w-max'
  ].filter(Boolean)
 })
@@ -252,6 +253,25 @@ const itemClass = computed(() => {
 })
 
 const topNavs = computed(() => props.navsPosition.startsWith('top'))
+const verticalNavs = computed(() => props.navsPosition === 'vertical')
+const isIndividualNavs = computed(() => props.navsPosition === 'sides' || verticalNavs.value)
+const propsNavs = computed(() => {
+ return {
+  scrollNext,
+  scrollPrev,
+  containerClass: props.classNavs,
+  navClass: props.classNav,
+  size: props.navsSize,
+  variant: props.navsVariant,
+  color: props.navsColor,
+  labelNext: props.navNextLabel,
+  labelPrev: props.navPrevLabel,
+  prevIcon: props.navPrevIcon,
+  nextIcon: props.navNextIcon,
+  position: props.navsPosition,
+  margin: props.navsMargin
+ }
+})
 
 onMounted(async () => {
  await nextTick()
@@ -270,44 +290,15 @@ onMounted(async () => {
 
     <!--Navs top-->
     <div v-if="withNavs && (topNavs  && !isIndividualNavs)">
-     <Navs
-       :scroll-next="scrollNext"
-       :scroll-prev="scrollPrev"
-       :container-class="classNavs"
-       :nav-class="classNav"
-       :size="navsSize"
-       :variant="navsVariant"
-       :color="navsColor"
-       :label-next="navNextLabel"
-       :label-prev="navPrevLabel"
-       :prev-icon="navPrevIcon"
-       :next-icon="navNextIcon"
-       :position="navsPosition"
-       :margin="navsMargin"
-     />
+     <Navs v-bind="propsNavs"/>
     </div>
     <!--Navs Top End-->
 
     <!-- Main Carousel -->
     <div :class="primaryCarouselClass">
      <!--Nav Prev -->
-     <div v-if="withNavs && isIndividualNavs">
-      <Navs
-        :scroll-next="scrollNext"
-        :scroll-prev="scrollPrev"
-        :container-class="classNavs"
-        :nav-class="classNav"
-        :size="navsSize"
-        :variant="navsVariant"
-        :color="navsColor"
-        :label-next="navNextLabel"
-        :label-prev="navPrevLabel"
-        :prev-icon="navPrevIcon"
-        :next-icon="navNextIcon"
-        :position="navsPosition"
-        :margin="navsMargin"
-        :hidden-next="true"
-      />
+     <div v-if="withNavs && (isIndividualNavs &&( !isMobile || verticalNavs))">
+      <Navs v-bind="propsNavs" :hidden-next="true" :nav-class="[classNav, {'rotate-90': verticalNavs}]"/>
      </div>
      <!--Nav Prev End-->
      <UCarousel
@@ -365,45 +356,16 @@ onMounted(async () => {
       </div>
      </UCarousel>
      <!--Nav Next -->
-     <div v-if="withNavs && isIndividualNavs">
-      <Navs
-        :scroll-next="scrollNext"
-        :scroll-prev="scrollPrev"
-        :container-class="classNavs"
-        :nav-class="classNav"
-        :size="navsSize"
-        :variant="navsVariant"
-        :color="navsColor"
-        :label-next="navNextLabel"
-        :label-prev="navPrevLabel"
-        :prev-icon="navPrevIcon"
-        :next-icon="navNextIcon"
-        :position="navsPosition"
-        :margin="navsMargin"
-        :hidden-prev="true"
-      />
+     <div v-if="withNavs && (isIndividualNavs &&( !isMobile || verticalNavs))">
+      <Navs v-bind="propsNavs" :hidden-prev="true" :nav-class="[classNav, {'rotate-90':verticalNavs}]"/>
      </div>
      <!--Nav Next  End-->
     </div>
     <!-- Main Carousel  End-->
 
     <!--Navs Bottom-->
-    <div v-if="withNavs && (!topNavs && !isIndividualNavs)">
-     <Navs
-       :scroll-next="scrollNext"
-       :scroll-prev="scrollPrev"
-       :container-class="classNavs"
-       :nav-class="classNav"
-       :size="navsSize"
-       :variant="navsVariant"
-       :color="navsColor"
-       :label-next="navNextLabel"
-       :label-prev="navPrevLabel"
-       :prev-icon="navPrevIcon"
-       :next-icon="navNextIcon"
-       :position="navsPosition"
-       :margin="navsMargin"
-     />
+    <div v-if="withNavs && ((!topNavs && !isIndividualNavs) || (props.navsPosition === 'sides' && isMobile ))">
+     <Navs v-bind="propsNavs"/>
     </div>
     <!--Navs Bottom End-->
 
