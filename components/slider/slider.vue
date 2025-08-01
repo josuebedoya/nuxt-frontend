@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import Thumbs from './partials/thumbs.vue'
-import CsTailwind from "~/utils/csTalwind";
+import CsTailwind from "~/utils/csTalwind"
+import Dots from "./partials/dots.vue";
+import Navs from "./partials/navs.vue";
 
 const props = defineProps({
  isActive: {type: Boolean, default: true},
@@ -34,17 +36,30 @@ const props = defineProps({
  activeContainer: {type: Boolean, default: false},
  sizeContainer: {type: String, default: '2xl:container'},
 
- //NAVS & DOTS
- withDots: {type: Boolean, default: true},
+ //NAVS
  withNavs: {type: Boolean, default: true},
- colorNavs: {type: String, default: "primary"},
- sizeNavs: {type: String, default: "md"},
- variantNavs: {type: String, default: "ghost"},
+ navsColor: {type: String, default: "primary"},
+ navsSize: {type: String, default: "md"},
+ navsVariant: {type: String, default: "ghost"},
  navPrevIcon: {type: String, default: "material-symbols:arrow-back-ios-new"},
  navNextIcon: {type: String, default: "material-symbols:arrow-forward-ios-rounded"},
  navPrevLabel: {type: String, default: ""},
  navNextLabel: {type: String, default: ""},
  classNavs: {type: String, default: ""},
+ classNav: {type: String, default: "!rounded-full"},
+ navsPosition: {type: String, default: 'bottom-center'},
+ navsMargin: {type: String, default: 'm-2'},
+
+ // DOTS
+ withDots: {type: Boolean, default: true},
+ classDots: {type: String, default: "m-2"},
+ classDot: {type: String, default: ""},
+ dotsPosition: {type: String, default: 'bottom'},
+ dotsPadding: {type: String, default: 'sm'},
+ dotsSize: {type: String, default: 'text-[14px]'},
+ dotsType: {type: String, default: 'rounded'},
+ dotsVariant: {type: String, default: 'solid'},
+ dotsColor: {type: String, default: 'primary'},
 
  // THUMBS
  withThumbs: {type: Boolean, default: false},
@@ -63,17 +78,24 @@ const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
 const activeIndexes = ref([])
 const thumbsVertical = ref(props.thumbsProps?.isVertical);
+const scrollSnaps = ref([]);
+const selectedIndex = ref(0);
+const canScrollNext = ref(false);
+const canScrollPrev = ref(false);
 provide('activeThumbs', activeIndexes) // This to share state active with thumbs
+provide('selectedIndex', selectedIndex) // This to share state active Dot
+provide('canScrollNext', canScrollNext) // This to share scroll possibility with navs
+provide('canScrollPrev', canScrollPrev) // This to share scroll possibility with navs
 
 // Update item ref
-const setItemRef = (el: HTMLElement | null) => {
+const setItemRef = (el: HTMLElement | null): any => {
  if (el && !itemRefs.value.includes(el)) {
   itemRefs.value.push(el)
  }
 }
 
 // Controller Section Active
-function emblaController() {
+function emblaController(): any {
  const emblaApi = carouselRef.value?.emblaApi
  if (!emblaApi) return
 
@@ -82,19 +104,49 @@ function emblaController() {
    const index = emblaApi.selectedScrollSnap() * props.itemsByTransition
    onSelect(index)
   })
+  selectedIndex.value = emblaApi.selectedScrollSnap() || 0
+  canScrollNext.value = emblaApi?.canScrollNext() || false;
+  canScrollPrev.value = emblaApi?.canScrollPrev() || false;
+ })
+ emblaApi.on("init", onInit)
+ emblaApi.on("init", () => {
+  canScrollNext.value = emblaApi?.canScrollNext() || false;
+  canScrollPrev.value = emblaApi?.canScrollPrev() || false;
  })
 }
 
 // Go to select item
-function select(index: number) {
- const slideGroupIndex = Math.floor(index / props.itemsByTransition);
+function select(index: number): any {
+ const slideGroupIndex = Math.floor(index / props.itemsByTransition)
 
  carouselRef.value?.emblaApi?.scrollTo(slideGroupIndex)
- onSelect(slideGroupIndex * props.itemsByTransition);
+ onSelect(slideGroupIndex * props.itemsByTransition)
+}
+
+function scrollTo(index: Number): any {
+ const emblaApi = carouselRef.value?.emblaApi
+ if (!emblaApi) return
+ emblaApi.scrollTo(index);
+}
+
+function scrollPrev(): any {
+ const emblaApi = carouselRef.value?.emblaApi
+ if (!emblaApi) return
+ emblaApi.scrollPrev();
+}
+
+function scrollNext(): any {
+ const emblaApi = carouselRef.value?.emblaApi
+ if (!emblaApi) return
+ emblaApi.scrollNext();
+}
+
+function onInit(api: any) {
+ scrollSnaps.value = api?.scrollSnapList() || [];
 }
 
 // Fix select item
-function onSelect(index: number) {
+function onSelect(index: number): any {
  const total = props.items.length
  const indexes: number[] = []
 
@@ -107,79 +159,164 @@ function onSelect(index: number) {
 }
 
 // Stop Animation
-function stop(method?: string = 'autoplay') {
+function stop(method: string = 'autoplay'): any {
  const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
 
  if (pluginMethod) pluginMethod.stop()
 }
 
 // Play Animation
-function play(method?: string = 'autoplay') {
+function play(method: string = 'autoplay'): any {
  const pluginMethod = carouselRef.value?.emblaApi?.plugins()?.[method]
 
  if (pluginMethod) pluginMethod.play()
 }
 
-// Dimensions container (THIS FROM USE THUMBS)
-function dimensionContainer() {
- const isVertical = props.isVertical;
+// Dimensions container
+function dimensionContainer(): any {
+ const isVertical = props.isVertical
  const numItems = Object.values(props.breakPoint).slice(-1)[0];
- const viewport = carouselRef.value?.emblaRef;
- const container = viewport?.childNodes[0] ?? null;
- const measurements = itemRefs.value.map(el => (isVertical ? el?.offsetHeight : el?.offsetWidth));
- const largerSize = Math.max(...measurements ?? []);
- const size = (largerSize + 2) * numItems;
-
+ const viewport = carouselRef.value?.emblaRef
+ const emblaApi = carouselRef.value?.emblaApi
+ const itemsInView = emblaApi?.slidesInView();
+ const container = viewport?.childNodes[0] ?? null
+ const measurements = itemRefs.value.map(el => (isVertical ? el?.offsetHeight : el?.offsetWidth))
+ const largerSize = Math.max(...measurements ?? [])
+ const size = (largerSize + 2) * (typeof numItems === 'number' ? numItems : (itemsInView.length === 0 ? 1 : itemsInView.length))
  if ((viewport && container) && (props.autoDimensionedViewport || isVertical)) {
   if (isVertical) {
-   viewport.style.maxHeight = `${size}px`;
-   container.style.maxHeight = `${size}px`;
+   viewport.style.maxHeight = `${size}px`
+   container.style.maxHeight = `${size}px`
   } else {
-   viewport.style.maxWidth = `${size}px`;
-   container.style.maxWidth = `${size}px`;
+   viewport.style.maxWidth = `${size}px`
+   container.style.maxWidth = `${size}px`
   }
  }
 }
 
+const isIndividualNavs = computed(() => props.navsPosition === 'sides' || props.navsPosition === 'vertical')
+
+/* Classes Component */
+// Container
+const classContainer = computed(() => {
+ return props.activeContainer && [props.sizeContainer, 'mx-auto'].filter(Boolean)
+})
+// Carousel
+const carouselClass = computed(() => {
+ return [`carousel${props.id}`
+ ].filter(Boolean)
+})
+// Primary Slider
+const primaryCarouselClass = computed(() => {
+ const isVertical = props.navsPosition === 'vertical';
+ return [
+  'primary-carousel mx-auto max-w-max',
+  isIndividualNavs.value && 'flex justify-center items-center',
+  props.autoDimensionedViewport && 'max-w-max'
+ ].filter(Boolean)
+})
+// Root carousel
+const rootClass = computed(() => {
+ return [
+  'slide-content m-auto',
+  (props.withThumbs && thumbsVertical.value) && 'max-w-[95%]',
+  !props.autoDimensionedViewport ? 'w-full max-w-max' : 'w-auto',
+  props.rootClass
+ ].filter(Boolean)
+})
+// Viewport carousel
+const viewportClass = computed(() => {
+ return [
+  'm-auto viewport',
+  props.isVertical ? 'max-w-max' : 'max-h-max',
+  thumbsVertical.value ? 'flex-row justify-between' : 'flex-col justify-center',
+  props.viewportClass
+ ].filter(Boolean)
+})
+// container carousel
+const containerCarouselClass = computed(() => {
+ return [
+  props.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
+  'slide-container justify-start !m-0',
+  props.containerClass
+ ].filter(Boolean)
+})
+// items
+const itemClass = computed(() => {
+ return [
+  props.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
+  props.classItem,
+  CsTailwind(props.breakPoint || {}, 'basis-1/').join(' '),
+  'slide !m-0 !p-0'
+ ].filter(Boolean)
+})
+
+const topNavs = computed(() => props.navsPosition.startsWith('top'))
+
 onMounted(async () => {
- await nextTick();
+ await nextTick()
 
  // Use embla Controller
- emblaController();
+ emblaController()
 
  // Dimensioned container
- dimensionContainer();
+ dimensionContainer()
 });
-
 </script>
 <template>
- <section :id="id" class="w-full h-auto">
-  <div :class="activeContainer && sizeContainer">
-   <div
-     :class="[
-        `carousel${id}`,
-        'flex gap-8 w-full items-center',
-        thumbsVertical ? 'flex-row justify-between' : 'flex-col justify-center',
-     ]"
-   >
+ <section :id="id" class="w-full h-auto block">
+  <div :class="classContainer">
+   <div :class="carouselClass">
+
+    <!--Navs top-->
+    <div v-if="withNavs && (topNavs  && !isIndividualNavs)">
+     <Navs
+       :scroll-next="scrollNext"
+       :scroll-prev="scrollPrev"
+       :container-class="classNavs"
+       :nav-class="classNav"
+       :size="navsSize"
+       :variant="navsVariant"
+       :color="navsColor"
+       :label-next="navNextLabel"
+       :label-prev="navPrevLabel"
+       :prev-icon="navPrevIcon"
+       :next-icon="navNextIcon"
+       :position="navsPosition"
+       :margin="navsMargin"
+     />
+    </div>
+    <!--Navs Top End-->
+
     <!-- Main Carousel -->
-    <div
-      :class="[
-          'primary-carousel grow',
-          withThumbs && thumbsVertical ? 'w-[85%]' : 'w-full',
-          isVertical ? 'max-w-max':'max-w-full'
-      ]"
-    >
+    <div :class="primaryCarouselClass">
+     <!--Nav Prev -->
+     <div v-if="withNavs && isIndividualNavs">
+      <Navs
+        :scroll-next="scrollNext"
+        :scroll-prev="scrollPrev"
+        :container-class="classNavs"
+        :nav-class="classNav"
+        :size="navsSize"
+        :variant="navsVariant"
+        :color="navsColor"
+        :label-next="navNextLabel"
+        :label-prev="navPrevLabel"
+        :prev-icon="navPrevIcon"
+        :next-icon="navNextIcon"
+        :position="navsPosition"
+        :margin="navsMargin"
+        :hidden-next="true"
+      />
+     </div>
+     <!--Nav Prev End-->
      <UCarousel
        :active="isActive"
        ref="carouselRef"
        @select="onSelect"
        :items="items"
        v-slot="{ item }"
-       :class-names="{
-              snapped: '',
-              inView: ['active', ...classItemActive.split(' ')]
-       }"
+       :class-names="{snapped: '', inView: ['active', ...classItemActive.split(' ')]}"
        :loop="loop || reverse"
        :orientation="isVertical ? 'vertical' : 'horizontal'"
        :dragFree="dragFree"
@@ -189,50 +326,28 @@ onMounted(async () => {
        :inViewThreshold="0.6"
 
        :auto-scroll="autoScroll ? {
-              direction: reverse ? 'backward' : 'forward',
-              stopOnMouseEnter: pauseOnHover,
-              stopOnInteraction: !pauseOnHover,
-              isPlaying: pauseOnHover,
-              speed: speed
+         direction: reverse ? 'backward' : 'forward',
+         stopOnMouseEnter: pauseOnHover,
+         stopOnInteraction: !pauseOnHover,
+         isPlaying: pauseOnHover,
+         speed: speed
        } : false"
        :autoplay="autoPlay &&  !autoScroll ? {
-              direction: reverse ? 'backward' : 'forward',
-              delay,
-              stopOnMouseEnter: pauseOnHover,
-              stopOnInteraction: !pauseOnHover,
-              jump: false
+         direction: reverse ? 'backward' : 'forward',
+         delay,
+         stopOnMouseEnter: pauseOnHover,
+         stopOnInteraction: !pauseOnHover,
+         jump: false
        } : false"
        :fade="fade"
 
-       :arrows="withNavs"
-       :prev="{
-                label: navPrevLabel,
-                color: colorNavs,
-                size: sizeNavs,
-                variant: variantNavs,
-                onClick:emblaController
-       }"
-       :next="{
-                label: navNextLabel,
-                color: colorNavs,
-                size: sizeNavs,
-                variant: variantNavs,
-                onClick:emblaController
-       }"
-       :prev-icon="navPrevIcon.trim()"
-       :next-icon="navNextIcon.trim()"
-       :dots="withDots"
-
+       :arrows="false"
+       :dots="false"
        :ui="{
-            root: `slide-content ${ withThumbs && thumbsVertical? 'max-w-[95%]' : 'w-full'} ${rootClass}`,
-            viewport: `${isVertical ? 'max-w-max' : 'max-h-max'} m-auto viewport ${viewportClass}`,
-            container: `slide-container ui-${isVertical ? 'v' : 'h'}-container ${isVertical ? '!items-center' : '!items-start'} justify-start !m-0 ${containerClass}`,
-            item: `slide ${classItem} !m-0 !p-0 ${[CsTailwind(breakPoint || {}, 'basis-1/').join(' ')]}`,
-            dots: 'dots !static my-3',
-            controls: 'controls',
-            arrows: 'navs',
-            prev: `cursor-pointer ${classNavs}`,
-            next: `cursor-pointer flex flex-row-reverse ${classNavs}`
+            root: rootClass,
+            viewport:viewportClass,
+            container: containerCarouselClass,
+            item: itemClass,
        }"
 
        :breakpoints="{
@@ -249,8 +364,64 @@ onMounted(async () => {
 
       </div>
      </UCarousel>
+     <!--Nav Next -->
+     <div v-if="withNavs && isIndividualNavs">
+      <Navs
+        :scroll-next="scrollNext"
+        :scroll-prev="scrollPrev"
+        :container-class="classNavs"
+        :nav-class="classNav"
+        :size="navsSize"
+        :variant="navsVariant"
+        :color="navsColor"
+        :label-next="navNextLabel"
+        :label-prev="navPrevLabel"
+        :prev-icon="navPrevIcon"
+        :next-icon="navNextIcon"
+        :position="navsPosition"
+        :margin="navsMargin"
+        :hidden-prev="true"
+      />
+     </div>
+     <!--Nav Next  End-->
     </div>
     <!-- Main Carousel  End-->
+
+    <!--Navs Bottom-->
+    <div v-if="withNavs && (!topNavs && !isIndividualNavs)">
+     <Navs
+       :scroll-next="scrollNext"
+       :scroll-prev="scrollPrev"
+       :container-class="classNavs"
+       :nav-class="classNav"
+       :size="navsSize"
+       :variant="navsVariant"
+       :color="navsColor"
+       :label-next="navNextLabel"
+       :label-prev="navPrevLabel"
+       :prev-icon="navPrevIcon"
+       :next-icon="navNextIcon"
+       :position="navsPosition"
+       :margin="navsMargin"
+     />
+    </div>
+    <!--Navs Bottom End-->
+
+    <!--Dots-->
+    <div v-if="withDots">
+     <Dots
+       :dots="[...scrollSnaps]"
+       :container-class="classDots"
+       :scroll-to="scrollTo"
+       :vertical="false"
+       :dot-class="classDot"
+       :size="dotsSize"
+       :type="dotsType"
+       :variant="dotsVariant"
+       :color="dotsColor"
+     />
+    </div>
+    <!--Dots End-->
 
     <!-- Thumbs -->
     <div
