@@ -1,2 +1,14 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@theme {
+    --color-primary: #172E3F;
+    --color-secondary: #980027;
+    --color-tertiary: #777382;
+    --color-quaternary:  #eeeeee;
+    --color-dark-1: #0C1521;
+    --color-dark-2: #050F1E;
+    --color-dark-3: #1E264A;
+    --color-gray-1: #F0F0F0;
+    
+}
