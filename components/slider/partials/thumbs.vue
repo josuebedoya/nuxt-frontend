@@ -25,7 +25,8 @@ const sliderProps = {
  withDots: props.thumbsProps?.withDots ?? false,
  withNavs: props.thumbsProps?.withNavs ?? true,
  speed: props.thumbsProps?.speed ?? 0.6,
- navPosition: props.thumbsProps?.navPosition ?? 'sides',
+ navsPosition: props.thumbsProps?.navsPosition ?? 'sides',
+ navsMargin: props.thumbsProps?.navsMargin ?? 'mx-1',
  ...props.thumbsProps
 }
 </script>
