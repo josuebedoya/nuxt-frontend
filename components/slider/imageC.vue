@@ -1,12 +1,12 @@
 <template>
-  <img :src="item?.image" :alt="item?.image"
+  <img :src="componentItem?.image" :alt="componentItem?.image"
        class="w-16 h-16 rounded-md shadow-md"
   />
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  item: object,
+ componentItem: object,
   classImg?: string
 }>();
 </script>
