@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<sliderProps>(), {
   autoPlay: true,
   autoScroll: false,
   fade: false,
-  delay: 3000,
+  delay: 2500,
   speed: 1,
   pauseOnHover: false,
   loop: false,
@@ -25,7 +25,8 @@ const props = withDefaults(defineProps<sliderProps>(), {
   centeredItems: false,
   itemsByTransition: 1,
   moveWithWheel: false,
-  dragFree: false
+  dragFree: false,
+  autoDimensioned: false
  },
  activeContainer: false,
  sizeContainer: '2xl:container',
@@ -51,9 +52,7 @@ const props = withDefaults(defineProps<sliderProps>(), {
 const carouselRef = ref(null)
 const sliderControls = useEmblaController(carouselRef, props)
 const itemRefs = ref<HTMLElement[]>([])
-const activeIndexes = ref([])
-const scrollSnaps = ref(sliderControls?.scrollSnaps);
-provide('activeThumbs', activeIndexes) // This to share state active with thumbs
+provide('activeThumbs', sliderControls?.activeIndexes) // This to share state active with thumbs
 provide('selectedIndex', sliderControls?.selectedIndex) // This to share state active Dot
 provide('canScrollNext', sliderControls?.canScrollNext) // This to share scroll possibility with navs
 provide('canScrollPrev', sliderControls?.canScrollPrev) // This to share scroll possibility with navs
@@ -142,14 +141,13 @@ const propsNavs = computed(() => ({
 }))
 const propsDots = computed(() => ({
  scrollTo: sliderControls?.scrollTo,
- dots: scrollSnaps.value,
+ dots: sliderControls?.scrollSnaps.value || [],
  vertical: (dotsPosition.value === 'right' || dotsPosition.value === 'left') && !isMobile.value,
  ...props.dotsConfig
 }))
 
 onMounted(async () => {
  await nextTick()
-
  // Use embla Controller
  sliderControls?.mainController()
 
@@ -175,10 +173,8 @@ onMounted(async () => {
       </div>
 
       <div class="min-w-0 overflow-hidden max-[768px]:col-span-full"
-           :class="[
-             {'md:grid md:grid-cols-[1fr_max-content] items-center': dotsPosition === 'right'},
-             {'md:grid md:grid-cols-[max-content_1fr] items-center': dotsPosition === 'left'},
-             ]">
+           :class="[{'md:grid md:grid-cols-[1fr_max-content] items-center': dotsPosition === 'right', 'md:grid md:grid-cols-[max-content_1fr] items-center': dotsPosition === 'left'}]"
+      >
 
        <!--Dots-->
        <div v-if="withDots && (dotsPosition === 'top'|| dotsPosition === 'left')" class="shrink-0">
@@ -189,11 +185,11 @@ onMounted(async () => {
        <UCarousel
          :active="isActive"
          ref="carouselRef"
-         @select="sliderControls?.onSelect"
          :items="items"
-         v-slot="{ item }"
+         @select="sliderControls?.onSelect"
+         v-slot="{ item, index }"
          v-bind="config"
-         :class-names="{snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')]}"
+         :class-names="{snapped: '', inView: ['active', ...props.item?.classActive.split(' ')]}"
          :loop="config?.loop || config?.reverse"
          :orientation="config?.isVertical ? 'vertical' : 'horizontal'"
          :wheelGestures="config?.isVertical &&config?. moveWithWheel"
@@ -210,12 +206,11 @@ onMounted(async () => {
        } : false"
          :autoplay="config?.autoPlay &&  !config?.autoScroll ? {
          direction: config?.reverse ? 'backward' : 'forward',
-         delay: config?.delay ,
+         delay: config?.delay || 3000,
          stopOnMouseEnter:config?. pauseOnHover,
          stopOnInteraction: !config?.pauseOnHover,
          jump: false
        } : false"
-         :fade="config?.fade"
 
          :arrows="false"
          :dots="false"
@@ -231,21 +226,22 @@ onMounted(async () => {
         500:{slidesToScroll: 1}
        }"
        >
-        <div
-          :ref="setItemRef"
-          class="w-full min-w-0 max-w-full h-full"
-          :class="props.item?.padding"
-        >
-         <component :componentItem="item" :is="component"/>
-
-        </div>
+        <template v-if="$slots.default">
+         <div
+           :ref="setItemRef"
+           v-bind="props.item?.actions"
+           :class="[{'max-w-max':config?.autoDimensioned},props.item?.padding]"
+           class="content w-full min-w-0 h-full"
+         >
+          <slot :item="item" :index="index"/>
+         </div>
+        </template>
        </UCarousel>
 
        <!--Dots-->
        <div v-if="withDots && (dotsPosition === 'bottom' || dotsPosition === 'right')" class="shrink-0">
         <Dots v-bind="propsDots"/>
        </div>
-
       </div>
 
       <!--Nav Next -->
@@ -265,11 +261,10 @@ onMounted(async () => {
      <!-- Thumbs -->
      <Thumbs
        :items="items"
-       :component="componentThumb"
-       :select="sliderControls?.select"
        :controls="{
-              stop: () => sliderControls?.stop(config?.autoScroll ? 'autoScroll' : 'autoplay'),
-              play: () => sliderControls?.play(config?.autoScroll ? 'autoScroll' : 'autoplay')
+        select: sliderControls?.select,
+        stop: () => sliderControls?.stop(config?.autoScroll ? 'autoScroll' : 'autoplay'),
+        play: () => sliderControls?.play(config?.autoScroll ? 'autoScroll' : 'autoplay')
        }"
        :move-on-over="thumbsConfig?.moveOnHover"
        :slider-config="thumbsConfig?.sliderConfig"

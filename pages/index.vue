@@ -1,30 +1,26 @@
 <template>
- <div class="flex items-center justify-center h-full w-full">
-  <div>
+ <div class="flex items-center justify-center">
+  <div class="w-full">
    <Slider
      :items="items"
-     :component="ITemC"
-     :component-thumb="ImgC"
      :active-container="false"
-     :auto-scroll="false"
      :with-navs="true"
-     :auto-play="false"
-     with-thumbs
-     loop
-     pause-on-hover
-     padding-items="p-2"
-     :items-by-transition="1"
-     :move-thumbs-on-hover="false"
-     :class-item="`flex items-center justify-center`"
-     class-item-active="opacity-100 rounded-full"
-     :break-point="{
-      'sm': 2,
-      'md': 3,
-      'lg': 4,
-      'xl': 5,
-      custom: 'min-[1300px]:!basis-1/6'
+     :navs-config="{position: 'sides'}"
+     :dots-config="{
+      position: 'bottom'
      }"
-   />
+     :with-dots="true"
+     :break-point="{0:3}"
+     with-thumbs
+     :move-thumbs-on-hover="false"
+     :thumbs-config="{
+      moveOnHover: false
+     }"
+   >
+    <template #default="{item}">
+     <ITemC :component-item="item"/>
+    </template>
+   </Slider>
   </div>
  </div>
 </template>
@@ -34,61 +30,62 @@
 import Slider from '@/components/slider/slider.vue'
 import ITemC from '@/components/slider/itemC.vue'
 import ImgC from '@/components/slider/imageC.vue'
+import Media from "~/components/media.vue";
 
 const items = [
  {
-  image: 'https://picsum.photos/640/640?random=2',
+  baseSrc: 'https://picsum.photos/640/640?random=2',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  },
  {
-  image: 'https://picsum.photos/640/328?random=5',
+  baseSrc: 'https://picsum.photos/640/328?random=5',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/640/640?random=3',
+  baseSrc: 'https://picsum.photos/640/640?random=3',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/640/640?random=4',
+  baseSrc: 'https://picsum.photos/640/640?random=4',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/528/528?random=5',
+  baseSrc: 'https://picsum.photos/528/528?random=5',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  },
  {
-  image: 'https://picsum.photos/640/640?random=6',
+  baseSrc: 'https://picsum.photos/640/640?random=6',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/528/528?random=1',
+  baseSrc: 'https://picsum.photos/528/528?random=1',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/640/320?random=1',
+  baseSrc: 'https://picsum.photos/640/320?random=1',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/640/640?random=1',
+  baseSrc: 'https://picsum.photos/640/640?random=1',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  },
  {
-  image: 'https://picsum.photos/640/328?random=1',
+  baseSrc: 'https://picsum.photos/640/328?random=1',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/468/468?random=5',
+  baseSrc: 'https://picsum.photos/468/468?random=5',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/468/468?random=1',
+  baseSrc: 'https://picsum.photos/468/468?random=1',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  }, {
-  image: 'https://picsum.photos/640/640?random=10',
+  baseSrc: 'https://picsum.photos/640/640?random=10',
   title: 'Image 1',
   summary: 'This is the summary for image 1.'
  },

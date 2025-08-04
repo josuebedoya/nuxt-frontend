@@ -1,15 +1,16 @@
 import type {EmblaCarouselType} from 'embla-carousel'
 import type {Ref} from 'vue'
 
-export function useEmblaController(refApi: Ref<{ emblaApi?: EmblaCarouselType } | null>, props: Ref<any>) {
+export function useEmblaController(refApi: Ref<{ emblaApi?: EmblaCarouselType } | null>, props: Ref<never>) {
     const api = () => refApi.value?.emblaApi
-    const getItemsByTransition = () => props.value?.config?.itemsByTransition || 1
-    const getLoop = () => props.value?.config?.loop ?? false
-    const getItems = () => props.value?.items || []
+    const getItemsByTransition = () => props.config?.itemsByTransition || 1
+    const getLoop = () => props?.config?.loop ?? false
+    const getItems = () => props?.items || []
     const canScrollPrev = ref(false)
     const canScrollNext = ref(false)
     const selectedIndex = ref(0)
-    const scrollSnaps = ref([])
+    const scrollSnaps = ref<number[]>([])
+    const activeIndexes = ref<number[]>([])
 
     const mainController = () => {
         if (!api()) return
@@ -37,12 +38,11 @@ export function useEmblaController(refApi: Ref<{ emblaApi?: EmblaCarouselType } 
             indexes.push(getLoop() ? current % getItems() : current);
         }
 
-        return indexes;
+        activeIndexes.value = indexes;
     }
     const select = (index: number) => {
         const slideGroupIndex = Math.floor(index / getItemsByTransition())
-
-        api()?.scrollTo(slideGroupIndex)
+        api()?.scrollTo(index)
         onSelect(slideGroupIndex * getItemsByTransition())
     }
     const onInit = () => {
@@ -66,7 +66,6 @@ export function useEmblaController(refApi: Ref<{ emblaApi?: EmblaCarouselType } 
         mainController,
         onSelect,
         select,
-        onInit,
         scrollTo,
         scrollPrev,
         scrollNext,
@@ -75,6 +74,7 @@ export function useEmblaController(refApi: Ref<{ emblaApi?: EmblaCarouselType } 
         canScrollPrev,
         canScrollNext,
         selectedIndex,
-        scrollSnaps
+        scrollSnaps,
+        activeIndexes
     }
 }

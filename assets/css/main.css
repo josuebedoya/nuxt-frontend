@@ -2,7 +2,7 @@
 @import "@nuxt/ui";
 
 @theme {
-    --color-primary: #172E3F;
+    --color-primary: #27f1ff;
     --color-secondary: #980027;
     --color-tertiary: #777382;
     --color-quaternary:  #eeeeee;
