@@ -9,8 +9,8 @@ interface navProps {
  hiddenNext?: boolean;
  hiddenPrev?: boolean;
  navClass?: string | string[] | Record<string, boolean>;
- prev?: Record<string, any>;
- next?: Record<string, any>;
+ prev?: Record<string, never>;
+ next?: Record<string, never>;
  size?: string;
  variant?: string;
  color?: string,
