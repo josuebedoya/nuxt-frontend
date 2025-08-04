@@ -28,25 +28,24 @@ export interface configThumbs {
 } // Thumbs
 
 export interface configSlide {
-    class?: string,
+    class?: string | object,
     classActive?: string,
     padding?: string,
+    actions?: Record<string, void>
 } // Item
 
 export interface sliderProps {
     activeContainer?: boolean,
     sizeContainer?: string,
     isActive?: boolean
-    component: never
-    componentThumb?: never
     items: Array<never>
     class?: classApi
     breakPoint: Record<string | number, string | number>
     config?: configSlider
     withNavs?: boolean
     withDots?: boolean
-    navsConfig?: Record<string, string | string[] | Record<string, boolean> >
-    dotsConfig?: Record<string, string | string[] >
+    navsConfig?: Record<string, string | string[] | Record<string, boolean>>
+    dotsConfig?: Record<string, string | string[]>
     withThumbs?: boolean
     thumbsConfig?: configThumbs
     item?: configSlide
