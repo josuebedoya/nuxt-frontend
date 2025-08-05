@@ -4,7 +4,7 @@ import type {Ref} from 'vue'
 export function useEmblaController(refApi: Ref<{
     emblaApi?: EmblaCarouselType
     emblaRef?: Ref<HTMLElement[]>
-} | null>, props: Ref<never>, itemRefs: Ref<HTMLElement[]>) {
+} | null>, props: Record<string, any>, itemRefs: Ref<HTMLElement[]>) {
 
     const api = () => refApi.value?.emblaApi
     const viewPort = () => refApi.value?.emblaRef
