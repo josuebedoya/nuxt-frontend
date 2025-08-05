@@ -30,8 +30,8 @@ const props = withDefaults(defineProps<navProps>(), {
  size: 'sm',
  variant: 'ghost',
  color: 'primary',
- nextIcon: 'material-symbols:arrow-forward-ios-rounded',
- prevIcon: 'material-symbols:arrow-back-ios-new',
+ nextIcon: 'mdi:chevron-right',
+ prevIcon: 'mdi:chevron-left',
  margin: 'm-2'
 })
 
