@@ -14,7 +14,10 @@
      with-thumbs
      :move-thumbs-on-hover="false"
      :thumbs-config="{
-      moveOnHover: false
+      moveOnHover: true,
+      sliderConfig:{
+       pauseOnHover: false
+      }
      }"
    >
     <template #default="{item}">
@@ -29,8 +32,6 @@
 
 import Slider from '@/components/slider/slider.vue'
 import ITemC from '@/components/slider/itemC.vue'
-import ImgC from '@/components/slider/imageC.vue'
-import Media from "~/components/media.vue";
 
 const items = [
  {

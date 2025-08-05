@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import IMedia from "~/components/IMedia.vue";
 
-const props = defineProps({
- items: {type: Array, required: true},
- controls: {type: Object, required: true},
- moveOnOver: {type: Boolean, default: false},
- sliderConfig: {type: Object, default: {}},
- imageConfig: {type: Object, default: () => ({})}
+interface thumbsProps {
+ items: Record<string, any>,
+ controls: Record<string, any>,
+ moveOnOver?: boolean,
+ sliderConfig?: Record<string, any>,
+ imageConfig?: Record<string, any>,
+ widthItem: string,
+ heightItem: string,
+}
+
+const props = withDefaults(defineProps<thumbsProps>(), {
+ moveOnOver: false,
+ sliderConfig: () => ({}),
+ imageConfig: () => ({}),
 })
 
 const activeThumbs = inject<Ref<number[]>>('activeThumbs')
@@ -25,7 +33,8 @@ const slider = {
   speed: props.sliderConfig?.config?.speed ?? 0.6,
  },
  item: {
-  class: 'max-w-max thumb ' + (props.sliderConfig?.item?.class ?? 'opacity-10 duration-300'),
+  class: '',
+  classActive: '',
   padding: props.sliderConfig?.item?.padding ?? (props.sliderConfig?.config?.isVertical ? 'py-3' : 'px-3'),
  },
  breakPoint: props.sliderConfig?.breakPoint ?? {0: 2, "md": 3, "xl": 4},
@@ -38,7 +47,8 @@ const slider = {
  ...props.sliderConfig
 }
 
-const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item?.classActive ?? 'opacity-100'}`)
+const thumbClass = computed(() => `${props.sliderConfig?.item?.class ?? 'opacity-30 duration-300 hover:opacity-100'}`)
+const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item?.classActive ?? 'opacity-100 '}`)
 </script>
 
 <template>
@@ -46,22 +56,25 @@ const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item
    :items="items"
    v-bind="slider"
    v-slot="{item, index}"
-   :item="{
-    ...slider.item,
-    classActive: activeThumbs ? activeThumbClass: ''
-   }"
  >
   <div
+    :class="[
+      thumbClass,
+      {[activeThumbClass] : activeThumbs?.includes(index)},
+      heightItem || 'h-16',
+      widthItem || 'w-16'
+      ]"
     @mouseenter="() => moveOnOver && controls?.select(index)"
     @mouseover="() => moveOnOver && controls?.stop()"
     @mouseleave="() => moveOnOver && controls?.play()"
     @click="() => !moveOnOver && controls?.select(index)"
   >
-   <IMedia
-     :base-src="item?.baseSrc"
-     :alt="`Image ${index + 1}`"
-     v-bind="props.imageConfig"
-   />
+   <img :src="item?.baseSrc" :alt="`Image ${index + 1}`" class="rounded-lg w-full h-full cursor-pointer object-cover"/>
+   <!--   <IMedia-->
+   <!--     :base-src="item?.baseSrc"-->
+   <!--     :alt="`Image ${index + 1}`"-->
+   <!--     v-bind="props.imageConfig"-->
+   <!--   />-->
   </div>
  </Slider>
 </template>
