@@ -12,8 +12,6 @@ const props = defineProps({
   classLinkEmail: { type: String, default: 'inline-block' },
   withHyphenEmail: { type: Boolean, default: true },
 })
-
-
 </script>
 
 <template>
@@ -21,7 +19,7 @@ const props = defineProps({
     <div v-if="showEmail && email" class="component-email">
         <div class="flex">
         <i v-if="showIcons" :class="[emailIcon,classIcons]"></i>
-        <div class="content-address">
+        <div class="content-email">
             <template v-for="(email, index) in email" :key="index">
             <span v-if="withHyphenEmail && index>0">&nbsp;-&nbsp;</span>
             <a :href="`mailto:${email}`" target="_blank" :class="classLinkEmail">

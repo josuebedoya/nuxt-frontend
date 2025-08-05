@@ -12,10 +12,7 @@ const props = defineProps({
   classTitle: { type: String, default: 'font-bold' },
   classLinkAddress: { type: String, default: 'inline-block' },
   withHyphenAddress: { type: Boolean, default: true },
-
 })
-
-
 </script>
 
 <template>

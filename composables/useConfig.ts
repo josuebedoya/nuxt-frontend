@@ -76,18 +76,12 @@ export const email = ref(['serviciocliente@readyrentacars.com'])
 
 export const contactInfo = ref({
   phone: {
-    icon: 'fa-solid fa-phone',
-    title: 'Teléfono',
     value: ['+57 311 8060834','+57 311 8060834']
   },
   address: {
-    icon: 'fa-solid fa-map-marker-alt',
-    title: 'Dirección',
     value: ['Calle 74 bis 83-45 · Aeropuerto El Dorado de Bogotá · servicio Meet & Greet'],
   },
   email: {
-    icon: 'fa-solid fa-envelope',
-    title: 'Correo',
     value: ['serviciocliente@readyrentacars.com'],
   }
 })

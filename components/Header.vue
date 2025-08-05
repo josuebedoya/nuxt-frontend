@@ -16,8 +16,6 @@ const menuMobileUI = ref({
   linkLabel: 'text-primary hover:text-secondary text-[14px] uppercase font-semibold',
 })
 
-
-
 </script>
 
 <template>

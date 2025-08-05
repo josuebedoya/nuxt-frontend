@@ -12,7 +12,6 @@ const props = defineProps({
   classComponent: { type: String, default: '' },
   withHyphenPhone: { type: Boolean, default: true },
 })
-
 </script>
 
 <template>
