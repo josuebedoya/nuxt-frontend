@@ -34,7 +34,8 @@
   <div class="relative max-w-7xl mx-auto px-4 flex flex-col-reverse lg:flex-row justify-end items-center gap-20 lg:gap-50">
     <!-- Image column -->
     <div class="w-full lg:w-2/5 lg:-mr-[140px]">
-      <IMedia
+        <ClientOnly>
+        <IMedia
             alt="Persona conduciendo"
             :base-src="infoRent.img"
             :ratio="ratioMedia"
@@ -42,6 +43,7 @@
             rounded="rounded-2xl"
             class="shadow-lg"
           />
+        </ClientOnly>  
     </div>
     <!-- Text column -->
     <div class="w-full lg:w-1/2 space-y-6">
@@ -51,7 +53,7 @@
       <h2 class="text-white lg:text-primary text-[30px] lg:text-[45px] font-semibold mb-5 text-center lg:text-left">
         {{infoRent.title}}
       </h2>
-      <div class="space-y-2 text-white lg:text-dark-3 text-[16px] lg:text-[20px] text-justify" v-html="infoRent.customHtml"></div>
+      <div class="space-y-2 text-white lg:text-dark-3 text-[16px] lg:text-[20px] text-justify custom-html" v-html="infoRent.customHtml"></div>
       <div class="text-center lg:text-left">
         <UButton :label="infoRent.caption" 
                 :to="infoRent.url" 
@@ -62,9 +64,11 @@
   </div>
 </section>
   <!-- Form Contacto -->
-  <section class="mt-15" :style="bgStyle">
-<div class="h-[500px]"></div>
-  </section>
+  <ClientOnly>
+    <section class="mt-15" :style="bgStyle">
+        <div class="h-[500px]"></div>
+    </section>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -97,5 +101,5 @@ useHead(() => ({
 </script>
 
 <style scoped>
-
+.custom-html ol { list-style: auto !important; }
 </style>

@@ -2,6 +2,22 @@
 import { ref } from 'vue'
 import { logoColor, menuItemsRC } from '~/composables/useConfig'
 
+//
+const menuDesktopUI = ref({
+  childList: 'grid grid-cols-1 gap-4 p-4',
+  childLink: 'px-2',
+  childLinkLabel: 'text-primary hover:text-primary text-[12px] font-semibold',
+  viewport:  'w-48',
+  linkLabel: 'text-primary hover:text-secondary text-[14px] uppercase font-semibold',
+  linkLeadingIcon: 'text-primary hover:text-primary' 
+})
+const menuMobileUI = ref({
+  linkLeadingIcon: 'hidden', 
+  linkLabel: 'text-primary hover:text-secondary text-[14px] uppercase font-semibold',
+})
+
+
+
 </script>
 
 <template>
@@ -20,13 +36,15 @@ import { logoColor, menuItemsRC } from '~/composables/useConfig'
         </div>
 
         <div class="menu">
-          <IMenu
+          <ClientOnly>
+            <MenuGeneral
             :menu-items="menuItemsRC"
-            :drawer-header-image="logoColor"
-            toggle-icon="i-lucide:menu"
-            class="flex space-x-6 items-center"
-            item-class="text-primary text-[14px] hover:text-secondary hover:before:bg-transparent uppercase font-semibold" 
+            :drawerHeader-image="logoColor"
+            toggleIcon="i-lucide:menu"
+            :menueUIMobil="menuMobileUI"
+            :menuUIDesktop="menuDesktopUI"
           />
+          </ClientOnly>
         </div>
 
       </div>
