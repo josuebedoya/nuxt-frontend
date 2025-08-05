@@ -50,8 +50,8 @@ const props = withDefaults(defineProps<sliderProps>(), {
  },
 })
 const carouselRef = ref(null)
-const sliderControls = useEmblaController(carouselRef, props)
 const itemRefs = ref<HTMLElement[]>([])
+const sliderControls = useEmblaController(carouselRef, props, itemRefs)
 provide('activeThumbs', sliderControls?.activeIndexes) // This to share state active with thumbs
 provide('selectedIndex', sliderControls?.selectedIndex) // This to share state active Dot
 provide('canScrollNext', sliderControls?.canScrollNext) // This to share scroll possibility with navs
@@ -63,28 +63,6 @@ const isMobile = computed(() => width.value <= 768);
 const setItemRef = (el: HTMLElement | null): any => {
  if (el && !itemRefs.value.includes(el)) {
   itemRefs.value.push(el)
- }
-}
-
-// Dimensions container
-function dimensionContainer(): any {
- const isVertical = props.config?.isVertical
- const numItems = Object.values(props.breakPoint).slice(-1)[0];
- const viewport = carouselRef.value?.emblaRef
- const emblaApi = carouselRef.value?.emblaApi
- const itemsInView = emblaApi?.slidesInView();
- const container = viewport?.childNodes[0] ?? null
- const measurements = itemRefs.value.map(el => (isVertical ? el?.offsetHeight : el?.offsetWidth))
- const largerSize = Math.max(...measurements ?? [])
- const size = (largerSize + 2) * (typeof numItems === 'number' ? numItems : (itemsInView.length === 0 ? 1 : itemsInView.length))
- if ((viewport && container) && (props.config?.autoDimensioned || isVertical)) {
-  if (isVertical) {
-   viewport.style.maxHeight = `${size}px`
-   container.style.maxHeight = `${size}px`
-  } else {
-   viewport.style.maxWidth = `${size}px`
-   container.style.maxWidth = `${size}px`
-  }
  }
 }
 
@@ -152,7 +130,7 @@ onMounted(async () => {
  sliderControls?.mainController()
 
  // Dimensioned container
- dimensionContainer()
+ sliderControls?.dimensionerContainer()
 });
 </script>
 <template>
