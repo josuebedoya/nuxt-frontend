@@ -2,26 +2,25 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
+  compatibilityDate: '2025-07-15',
   devtools: {enabled: true},
 
   modules: [
+    '@nuxt/content',
     '@nuxt/eslint',
-    '@nuxt/fonts',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxt/ui',
+    //Custom
     '@pinia/nuxt',
     '@nuxtjs/i18n',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
   ],
-
   i18n: {
     strategy: 'prefix_except_default',
     defaultLocale: 'es',
-    lazy: true,
     langDir: 'locales',
     locales: []
   },
