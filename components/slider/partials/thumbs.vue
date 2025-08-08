@@ -3,6 +3,7 @@ import IMedia from "~/components/IMedia.vue";
 
 interface thumbsProps {
  items: Record<string, any>,
+ activeItems: Array<number>,
  controls: Record<string, any>,
  moveOnOver?: boolean,
  sliderConfig?: Record<string, any>,
@@ -17,7 +18,6 @@ const props = withDefaults(defineProps<thumbsProps>(), {
  imageConfig: () => ({}),
 })
 
-const activeThumbs = inject<Ref<number[]>>('activeThumbs')
 const moveOnOver = computed(() => props.moveOnOver)
 
 const slider = {
@@ -60,7 +60,7 @@ const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item
   <div
     :class="[
       thumbClass,
-      {[activeThumbClass] : activeThumbs?.includes(index)},
+      {[activeThumbClass] : activeItems?.includes(index)},
       heightItem || 'h-16',
       widthItem || 'w-16'
       ]"
