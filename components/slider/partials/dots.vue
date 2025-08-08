@@ -5,6 +5,7 @@ interface dotsProps {
  dots: Array<number>,
  containerClass?: string | string[] | Record<string, boolean>,
  scrollTo: (index: number) => void,
+ activeDot: number,
  vertical?: boolean,
  dotClass?: string | string[] | Record<string, boolean>
  size?: string,
@@ -16,6 +17,7 @@ interface dotsProps {
 
 const props = withDefaults(defineProps<dotsProps>(), {
  vertical: false,
+ activeDot: 0,
  size: 'sm',
  variant: 'solid',
  type: 'rounded',
@@ -23,7 +25,6 @@ const props = withDefaults(defineProps<dotsProps>(), {
  margin: 'm-1'
 })
 
-const activeDot = inject<Ref<number[]>>('selectedIndex') || 0;
 const classDot = computed(() => ([
  'dot',
  variables.sizes.includes(props.size) && '!py-0 px-[2px]',

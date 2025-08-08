@@ -5,6 +5,8 @@ interface navProps {
  containerClass?: string | string[] | Record<string, boolean>;
  position?: string;
  scrollNext: () => void;
+ canScrollNext: boolean;
+ canScrollPrev: boolean;
  scrollPrev: () => void;
  hiddenNext?: boolean;
  hiddenPrev?: boolean;
@@ -23,7 +25,9 @@ interface navProps {
 
 const props = withDefaults(defineProps<navProps>(), {
  hiddenNext: false,
- hiddenPrev: false,
+ hiddenNext: false,
+ canScrollPrev: false,
+ canScrollNext: false,
  position: 'bottom-center',
  prev: () => ({}),
  next: () => ({}),
@@ -34,9 +38,6 @@ const props = withDefaults(defineProps<navProps>(), {
  prevIcon: 'mdi:chevron-left',
  margin: 'm-2'
 })
-
-const canScrollNext = inject<Ref<number[]>>('canScrollNext') || false;
-const canScrollPrev = inject<Ref<number[]>>('canScrollPrev') || false;
 
 const classNavs = computed(() => {
  return [

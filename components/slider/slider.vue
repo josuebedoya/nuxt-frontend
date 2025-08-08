@@ -52,10 +52,6 @@ const props = withDefaults(defineProps<sliderProps>(), {
 const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
 const sliderControls = useEmblaController(carouselRef, props, itemRefs)
-provide('activeThumbs', sliderControls?.activeIndexes) // This to share state active with thumbs
-provide('selectedIndex', sliderControls?.selectedIndex) // This to share state active Dot
-provide('canScrollNext', sliderControls?.canScrollNext) // This to share scroll possibility with navs
-provide('canScrollPrev', sliderControls?.canScrollPrev) // This to share scroll possibility with navs
 const {width} = useWindowSize();
 const isMobile = computed(() => width.value <= 768);
 
@@ -113,12 +109,15 @@ const bottomNavs = computed(() => navsPosition.value?.startsWith('bottom') || (i
 
 const propsNavs = computed(() => ({
  scrollNext: sliderControls?.scrollNext,
+ canScrollNext: sliderControls?.canScrollNext,
  scrollPrev: sliderControls?.scrollPrev,
+ canScrollPrev: sliderControls?.canScrollPrev,
  navClass: [...[props.navsConfig?.navClass], verticalNavs.value && 'rotate-90'].filter(Boolean),
  ...props.navsConfig,
 }))
 const propsDots = computed(() => ({
  scrollTo: sliderControls?.scrollTo,
+ activeDot: sliderControls?.selectedIndex,
  dots: sliderControls?.scrollSnaps.value || [],
  vertical: (dotsPosition.value === 'right' || dotsPosition.value === 'left') && !isMobile.value,
  ...props.dotsConfig
@@ -239,6 +238,7 @@ onMounted(async () => {
      <!-- Thumbs -->
      <Thumbs
        :items="items"
+       :active-items="sliderControls?.activeIndexes"
        :controls="{
         select: sliderControls?.select,
         stop: () => sliderControls?.stop(config?.autoScroll ? 'autoScroll' : 'autoplay'),
