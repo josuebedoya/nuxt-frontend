@@ -1,6 +1,6 @@
 <template>
  <div
-   class="item-card flex flex-col items-center justify-center p-4 bg-rose-900 shadow-md shadow-white rounded-lg cursor-pointer w-full">
+   class="item-card flex flex-col items-center justify-center p-4 bg-blue-200 shadow-md shadow-white rounded-lg cursor-pointer w-full">
   <div class="w-full h-full">
    <IMedia
      :base-src="componentItem?.baseSrc"
@@ -10,8 +10,8 @@
      overlay-gradient-hover="linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7))"
    />
   </div>
-  <h3 class="card-title !text-white">{{ componentItem?.title }}</h3>
-  <p class="card-content !text-white">{{ componentItem?.summary }}</p>
+  <h3 class="card-title !text-blue-900">{{ componentItem?.title }}</h3>
+  <p class="card-content !text-black">{{ componentItem?.summary }}</p>
  </div>
 </template>
 

@@ -5,7 +5,7 @@ interface dotsProps {
  dots: Array<number>,
  containerClass?: string | string[] | Record<string, boolean>,
  scrollTo: (index: number) => void,
- activeDot: number,
+ activeDot: number | object,
  vertical?: boolean,
  dotClass?: string | string[] | Record<string, boolean>
  size?: string,
@@ -17,7 +17,6 @@ interface dotsProps {
 
 const props = withDefaults(defineProps<dotsProps>(), {
  vertical: false,
- activeDot: 0,
  size: 'sm',
  variant: 'solid',
  type: 'rounded',
@@ -44,7 +43,9 @@ const dotProps = computed(() => ({
  size: props.size,
  type: props.type
 }));
+const indexActive = computed(() => (typeof props?.activeDot === 'object' ? props?.activeDot.value : props.activeDot) ?? 0)
 </script>
+
 <template>
  <div class="dots flex justify-center items-center gap-3 my-3" :class="[containerClass, {'flex-col mx-3': vertical}]">
   <div v-for="(_, index) in dots" :key="index">
@@ -52,8 +53,8 @@ const dotProps = computed(() => ({
      class="cursor-pointer max-[768px]:text-[10px] transition-all"
      :aria-label="`slide ${ index + 1 }`"
      v-bind="dotProps"
-     :class="[classDot,{'active': activeDot === index}]"
-     :data-state="activeDot === index? 'active' : void 0"
+     :class="[classDot,{'active': indexActive === index}]"
+     :data-state="indexActive === index? 'active' : void 0"
      @click="scrollTo(index)"
    >
     <span class="relative block opacity-0">&#x25AA;&#x25AA;&#x25AA;</span>
