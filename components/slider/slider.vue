@@ -102,6 +102,8 @@ const itemClass = computed(() => {
 // Navs  && Dots
 const navsPosition = computed(() => props.navsConfig?.position)
 const dotsPosition = computed(() => props.dotsConfig?.position)
+const canScrollPrev = computed(() => sliderControls?.canScrollPrev.value ?? false)
+const canScrollNext = computed(() => sliderControls?.canScrollNext.value ?? false)
 const verticalNavs = computed(() => navsPosition.value === 'vertical')
 const isIndividualNavs = computed(() => navsPosition.value === 'sides' || navsPosition.value === 'vertical')
 const topNavs = computed(() => navsPosition.value?.startsWith('top'))
@@ -109,9 +111,9 @@ const bottomNavs = computed(() => navsPosition.value?.startsWith('bottom') || (i
 
 const propsNavs = computed(() => ({
  scrollNext: sliderControls?.scrollNext,
- canScrollNext: sliderControls?.canScrollNext,
+ canScrollNext: canScrollNext.value,
  scrollPrev: sliderControls?.scrollPrev,
- canScrollPrev: sliderControls?.canScrollPrev,
+ canScrollPrev: canScrollPrev.value,
  navClass: [...[props.navsConfig?.navClass], verticalNavs.value && 'rotate-90'].filter(Boolean),
  ...props.navsConfig,
 }))
@@ -121,6 +123,16 @@ const propsDots = computed(() => ({
  dots: sliderControls?.scrollSnaps.value || [],
  vertical: (dotsPosition.value === 'right' || dotsPosition.value === 'left') && !isMobile.value,
  ...props.dotsConfig
+}))
+const thumbsProps = computed(() => ({
+ activeItems: sliderControls.activeIndexes,
+ controls: {
+  select: sliderControls?.select,
+  stop: () => sliderControls?.stop(props.config?.autoScroll ? 'autoScroll' : 'autoplay'),
+  play: () => sliderControls?.play(props.config?.autoScroll ? 'autoScroll' : 'autoplay')
+ },
+ moveOnOver: props.thumbsConfig?.moveOnHover,
+ sliderConfig: props.thumbsConfig?.sliderConfig
 }))
 
 onMounted(async () => {
@@ -136,14 +148,16 @@ onMounted(async () => {
  <section class="w-full h-auto block">
   <div :class="[classContainer, 'overflow-x-hidden']">
    <div :class="[`carousel`, {'vertical': config?.isVertical}]">
+
     <div class="primary-carousel">
-     <!--Controls-->
+
+     <!-- Navs when they go to top -->
      <Navs v-if="withNavs && topNavs" v-bind="propsNavs"/>
-     <!--Controls End-->
+     <!-- Navs End -->
 
      <!-- Main Carousel -->
      <div :class="primaryCarouselClass">
-      <!--Nav Prev -->
+      <!--Nav Prev (WHEN THEY GO TO SIDES OR VERTICAL) -->
       <div v-if="withNavs && (isIndividualNavs && ( !isMobile || verticalNavs))"
            class="shrink-0">
        <Navs v-bind="propsNavs" :hidden-next="true"/>
@@ -163,10 +177,10 @@ onMounted(async () => {
          :active="isActive"
          ref="carouselRef"
          :items="items"
-         @select="sliderControls?.onSelect"
          v-slot="{ item, index }"
          v-bind="config"
-         :class-names="{snapped: '', inView: ['active', ...props.item?.classActive.split(' ')]}"
+         @select="sliderControls.onSelect"
+         :class-names="{snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')]}"
          :loop="config?.loop || config?.reverse"
          :orientation="config?.isVertical ? 'vertical' : 'horizontal'"
          :wheelGestures="config?.isVertical &&config?. moveWithWheel"
@@ -221,32 +235,23 @@ onMounted(async () => {
        </div>
       </div>
 
-      <!--Nav Next -->
+      <!--Nav Next (WHEN THEY GO TO SIDES OR VERTICAL) -->
       <div v-if="withNavs && (isIndividualNavs &&( !isMobile || verticalNavs))"
            class="shrink-0">
        <Navs v-bind="propsNavs" :hidden-prev="true"/>
       </div>
      </div>
-     <!-- Main Carousel  End-->
+     <!-- Main Carousel  End -->
 
-     <!--Controls-->
+     <!-- Navs when they go to bottom -->
      <Navs v-if="withNavs && bottomNavs" v-bind="propsNavs"/>
-     <!-- Controls End-->
+     <!-- Navs End -->
 
     </div>
+
     <div v-if="withThumbs" class="thumbs-carousel my-4">
      <!-- Thumbs -->
-     <Thumbs
-       :items="items"
-       :active-items="sliderControls?.activeIndexes"
-       :controls="{
-        select: sliderControls?.select,
-        stop: () => sliderControls?.stop(config?.autoScroll ? 'autoScroll' : 'autoplay'),
-        play: () => sliderControls?.play(config?.autoScroll ? 'autoScroll' : 'autoplay')
-       }"
-       :move-on-over="thumbsConfig?.moveOnHover"
-       :slider-config="thumbsConfig?.sliderConfig"
-     />
+          <Thumbs :items="items" v-bind="thumbsProps"/>
      <!-- Thumbs End -->
     </div>
    </div>
