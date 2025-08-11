@@ -1,3 +1,9 @@
+<script setup lang="ts">
+  //Always use light for layout master
+  const colorMode = useColorMode()
+  colorMode.value = 'light'
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <Header />
@@ -7,6 +13,3 @@
     <Footer />
   </div>
 </template>
-
-<script setup lang="ts">
-</script>
