@@ -36,7 +36,7 @@ export function useEmblaController(refApi: Ref<{
         })
     }
 
-    function dimensionerContainer(): any {
+    const dimensionerContainer = () => {
         const isVertical = props.config?.isVertical
         const numItems = Object.values(props.breakPoint).slice(-1)[0];
         const itemsInView = api()?.slidesInView() || [];
@@ -73,9 +73,9 @@ export function useEmblaController(refApi: Ref<{
     const onInit = () => {
         scrollSnaps.value = api()?.scrollSnapList() || [];
     }
-    const scrollTo = (index: number) => api()?.scrollTo(index);
-    const scrollPrev = () => api()?.scrollPrev()
-    const scrollNext = () => api()?.scrollNext()
+    const scrollTo = (index: number) => api()?.scrollTo(index)
+    const scrollPrev = () => canScrollPrev && api()?.scrollPrev()
+    const scrollNext = () => canScrollNext && api()?.scrollNext()
     const stop = (method: string = 'autoplay') => {
         const pluginMethod = api()?.plugins()?.[method] as { stop: () => void } | undefined;
 
