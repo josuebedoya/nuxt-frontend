@@ -1,0 +1,4 @@
+/* use tailwind without prefix to external libraries in this
+way the libraries will not apply the prefix */
+@import "tailwindcss";
+@import "@nuxt/ui";

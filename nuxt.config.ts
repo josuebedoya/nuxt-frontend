@@ -25,7 +25,11 @@ export default defineNuxtConfig({
     locales: []
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [
+    //keep this order
+    '~/assets/css/libraries.css',
+    '~/assets/css/main.css',
+  ],
   vite: {
     plugins: [tailwindcss()]
   },

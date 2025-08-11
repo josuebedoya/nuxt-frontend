@@ -1,2 +1,2 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+/* here apply the prefix to all tailwind classes only for project */
+@import "tailwindcss" prefix(tw);
