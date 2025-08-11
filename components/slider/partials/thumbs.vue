@@ -3,17 +3,19 @@ import IMedia from "~/components/IMedia.vue";
 
 interface thumbsProps {
  items: Record<string, any>,
- activeItems: Array<number>,
+ activeItems: object,
  controls: Record<string, any>,
  moveOnOver?: boolean,
  sliderConfig?: Record<string, any>,
  imageConfig?: Record<string, any>,
- widthItem: string,
- heightItem: string,
+ widthItem?: string,
+ heightItem?: string,
 }
 
 const props = withDefaults(defineProps<thumbsProps>(), {
  moveOnOver: false,
+ widthItem: 'w-16',
+ heightItem: 'h-16',
  sliderConfig: () => ({}),
  imageConfig: () => ({}),
 })
@@ -46,9 +48,9 @@ const slider = {
  },
  ...props.sliderConfig
 }
-
 const thumbClass = computed(() => `${props.sliderConfig?.item?.class ?? 'opacity-30 duration-300 hover:opacity-100'}`)
 const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item?.classActive ?? 'opacity-100 '}`)
+const activeThumbsIndexes = computed(() => props.activeItems.value || [])
 </script>
 
 <template>
@@ -60,9 +62,9 @@ const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item
   <div
     :class="[
       thumbClass,
-      {[activeThumbClass] : activeItems?.includes(index)},
-      heightItem || 'h-16',
-      widthItem || 'w-16'
+      {[activeThumbClass] : Array.isArray(activeThumbsIndexes) && activeThumbsIndexes?.includes(index)},
+      heightItem,
+      widthItem
       ]"
     @mouseenter="() => moveOnOver && controls?.select(index)"
     @mouseover="() => moveOnOver && controls?.stop()"
