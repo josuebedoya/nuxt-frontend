@@ -1,4 +1,4 @@
-export interface classApi {
+export interface classesApi {
     root?: string | string[] | Record<string, boolean>
     container?: string | string[] | Record<string, boolean>
     viewport?: string | string[] | Record<string, boolean>
@@ -22,15 +22,15 @@ export interface configSlider {
 } // Basic Slider Config
 
 export interface configThumbs {
-    sliderConfig?: Record<string, never>,
+    sliderConfig?: Record<string, any>
     position?: string
-    moveOnHover?: boolean,
+    moveOnHover?: boolean
 } // Thumbs
 
 export interface configSlide {
-    class?: string | object,
-    classActive?: string,
-    padding?: string,
+    class?: string | object
+    classActive?: string
+    padding?: string
     actions?: Record<string, void>
 } // Item
 
@@ -38,9 +38,9 @@ export interface sliderProps {
     activeContainer?: boolean,
     sizeContainer?: string,
     isActive?: boolean
-    items: Array<never>
-    class?: classApi
-    breakPoint: Record<string | number, string | number>
+    items: any[]
+    classes?: classesApi
+    breakPoint?: Record<string, string | number>
     config?: configSlider
     withNavs?: boolean
     withDots?: boolean
@@ -50,3 +50,44 @@ export interface sliderProps {
     thumbsConfig?: configThumbs
     item?: configSlide
 } // All props
+
+export const sliderDefaults = {
+    isActive: true,
+    breakPoint: {0: 1, md: 2, lg: 3, xl: 4},
+    config: {
+        autoPlay: true,
+        autoScroll: false,
+        fade: false,
+        delay: 2500,
+        speed: 1,
+        pauseOnHover: false,
+        loop: false,
+        isVertical: false,
+        reverse: false,
+        centeredItems: false,
+        itemsByTransition: 1,
+        moveWithWheel: false,
+        dragFree: false,
+        autoDimensioned: false
+    },
+    activeContainer: false,
+    sizeContainer: '2xl:container',
+    withNavs: true,
+    withDots: true,
+    navsConfig: {
+        position: 'bottom-center'
+    },
+    dotsConfig: {
+        position: 'bottom'
+    },
+    withThumbs: false,
+    thumbsConfig: {
+        sliderConfig: {},
+        position: 'left',
+        moveOnHover: false
+    },
+    item: {
+        padding: 'p-4',
+        classActive: ''
+    }
+} satisfies Partial<sliderProps>
