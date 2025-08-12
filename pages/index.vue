@@ -9,12 +9,15 @@
      :dots-config="{
       position: 'bottom'
      }"
+     :config="{
+      autoPlay: true,
+     }"
      :with-dots="true"
      :break-point="{0:3}"
      with-thumbs
      :move-thumbs-on-hover="false"
      :thumbs-config="{
-      moveOnHover: true,
+      moveOnHover: false,
       sliderConfig:{
        pauseOnHover: false
       }
