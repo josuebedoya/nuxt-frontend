@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-const props = defineProps({
-  configComponentText: {
-    type: Object,
-    required: true,
-  },
-});
+import type { ConfigComponentText } from "@/types/components/componentText";
+
+const props = defineProps<{
+  configComponentText: ConfigComponentText;
+}>();
 
 const {
   typeTag = "p",
@@ -35,6 +34,8 @@ const {
   transition,
   textWrap,
   order,
+  colStart= "",
+  colPosition = "",
   icon,
 } = props.configComponentText || {};
 
@@ -51,6 +52,10 @@ const typography = computed(() =>
   ]
     .filter(Boolean)
     .join(" ")
+);
+
+const positionOrder = computed(() =>
+  [order, colStart, colPosition].filter(Boolean).join(" ")
 );
 
 const spacing = computed(() =>
@@ -72,7 +77,7 @@ const additionalStyles = computed(() =>
   <component
     :is="typeTag"
     :class="[
-      order,
+      positionOrder,
       typography,
       spacing,
       behavior,
