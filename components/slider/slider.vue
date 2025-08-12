@@ -2,59 +2,20 @@
 import {ref, onMounted, computed} from 'vue'
 import {useWindowSize} from "@vueuse/core"
 import type {sliderProps} from './partials/interfaces';
+import {sliderDefaults} from './partials/interfaces';
 import Thumbs from './partials/thumbs.vue'
 import CsTailwind from "~/utils/csTalwind"
 import Dots from "./partials/dots.vue";
 import Navs from "./partials/navs.vue";
 
-const props = withDefaults(defineProps<sliderProps>(), {
- isActive: true,
- autoDimensioned: false,
- breakPoint: {0: 1, md: 2, lg: 3, xl: 4},
- class: {},
- config: {
-  autoPlay: true,
-  autoScroll: false,
-  fade: false,
-  delay: 2500,
-  speed: 1,
-  pauseOnHover: false,
-  loop: false,
-  isVertical: false,
-  reverse: false,
-  centeredItems: false,
-  itemsByTransition: 1,
-  moveWithWheel: false,
-  dragFree: false,
-  autoDimensioned: false
- },
- activeContainer: false,
- sizeContainer: '2xl:container',
- withNavs: true,
- withDots: true,
- navsConfig: {
-  position: 'bottom-center'
- },
- dotsConfig: {
-  position: 'bottom'
- },
- withThumbs: false,
- thumbsConfig: {
-  sliderConfig: {},
-  position: 'left',
-  moveOnHover: false
- },
- item: {
-  padding: 'p-4',
-  classActive: ''
- },
-})
+const defaultProps = withDefaults(defineProps<sliderProps>(), sliderDefaults)
+const props = useMergeData(defaultProps, sliderDefaults) // Merged defaults props with user props used
+
 const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
 const sliderControls = useEmblaController(carouselRef, props, itemRefs)
 const {width} = useWindowSize();
 const isMobile = computed(() => width.value <= 768);
-
 // Update item ref
 const setItemRef = (el: HTMLElement | null): any => {
  if (el && !itemRefs.value.includes(el)) {
@@ -179,7 +140,7 @@ onMounted(async () => {
          :items="items"
          v-slot="{ item, index }"
          v-bind="config"
-         @select="sliderControls.onSelect"
+         @select="sliderControls?.onSelect"
          :class-names="{snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')]}"
          :loop="config?.loop || config?.reverse"
          :orientation="config?.isVertical ? 'vertical' : 'horizontal'"
