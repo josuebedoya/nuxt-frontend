@@ -6,6 +6,6 @@
 <template>
   <div>
     <h1>Page ID {{page.id}} --> {{ page.title }}</h1>
-    <pre>{{ page }}</pre>
+    <div>{{ page }}</div>
   </div>
 </template>

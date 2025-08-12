@@ -5,11 +5,13 @@
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <Header />
+  <div
+    class="tw:min-h-screen tw:flex tw:flex-col"
+    data-vaul-drawer-wrapper>
+    <IHeader/>
     <main class="flex-1">
-      <slot />
+      <slot/>
     </main>
-    <Footer />
+    <IFooter/>
   </div>
 </template>
