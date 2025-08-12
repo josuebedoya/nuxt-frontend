@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<thumbsProps>(), {
 const moveOnOver = computed(() => props.moveOnOver)
 
 const slider = {
- class: {
+ classes: {
   viewport: `thumbs-${props.sliderConfig?.isVertical ? 'v' : 'h'}-container`
  },
  config: {
