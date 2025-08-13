@@ -1,5 +1,115 @@
 <script lang="ts" setup>
 /**
+ *
+==========================================
+📋 USAGE EXAMPLE / EJEMPLO DE USO
+==========================================
+
+<Icard
+  :data-item="{
+    media: {
+      logo: 'https://example.com/logo.png',
+      banner: {
+        src: 'https://example.com/banner.jpg',
+        alt: 'Company Banner'
+      }
+    },
+    labels: {
+      title: 'Card Title',
+      subtitle: 'Card Subtitle',
+      description: {
+        text: 'Long description text here',
+        tag: 'p'
+      }
+    },
+    buttons: {
+      primary: {
+        label: 'Primary Action',
+        variant: 'primary',
+        size: 'lg'
+      },
+      secondary: {
+        label: 'Secondary',
+        variant: 'outline'
+      }
+    }
+  }"
+  :data-style="{
+    media: {
+      default: { colPosition: 1, class: 'w-full mb-4' },
+      logo: { colPosition: 1, class: 'w-16 h-16 rounded-full' },
+      banner: { colPosition: 2, class: 'w-full h-32 object-cover' }
+    },
+    labels: {
+      default: { colPosition: 1 },
+      title: { colPosition: 1, class: 'text-xl font-bold text-gray-800' },
+      subtitle: { colPosition: 1, class: 'text-sm text-gray-600' },
+      description: { colPosition: 2, class: 'text-gray-700' }
+    },
+    buttons: {
+      default: { colPosition: 2, class: 'mb-2' },
+      primary: { colPosition: 1, class: 'w-full mb-3' },
+      secondary: { colPosition: 2, class: 'w-auto' }
+    }
+  }"
+  :width-columns="['w-1/2', 'w-1/2']"
+  :style-column="['items-start', 'items-end']"
+  padding="p-6"
+  margin="m-4"
+  shadow="shadow-lg"
+  background="bg-white"
+  items-alignment="items-start"
+  custom-classes="rounded-lg border hover:shadow-xl transition-shadow"
+/>
+
+==========================================
+📊 DATA STRUCTURE EXPLANATION
+==========================================
+
+dataItem: {
+  media: {
+    [key]: string | { src: string, alt?: string }
+  },
+  labels: {
+    [key]: string | { text: string, tag?: string, [prop]: any }
+  },
+  buttons: {
+    [key]: { label: string, variant?: string, size?: string, [prop]: any }
+  }
+}
+
+dataStyle: {
+  [section]: {
+    default?: { colPosition?: number, class?: string, [prop]: any },
+    [itemKey]?: { colPosition?: number, class?: string, [prop]: any }
+  }
+}
+
+==========================================
+🎯 COLUMN POSITIONING
+==========================================
+
+colPosition: 1 = First column
+colPosition: 2 = Second column
+colPosition: N = Nth column
+
+If colPosition is not specified or invalid, defaults to column 1.
+
+==========================================
+🎨 STYLING PRIORITY
+==========================================
+
+1. Item-specific styles (highest priority)
+2. Section default styles
+3. Component default classes (lowest priority)
+
+Example:
+dataStyle.labels.title.class = "text-xl font-bold" (wins)
+dataStyle.labels.default.class = "text-base" (fallback)
+ *
+ */
+
+/**
  * Icard Component
  * Renders items (media, labels, buttons) in customizable columns with dynamic styling
  */
