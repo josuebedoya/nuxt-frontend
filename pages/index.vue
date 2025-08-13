@@ -1,5 +1,11 @@
 <script setup>
 const data = {
+  media: {
+    image1: {
+      src: "https://persistent.imagedescriber.online/image-describer-examples/000.jpg",
+      alt: "Image 1",
+    },
+  },
   labels: {
     date: "20-12-2050",
     welcome: "Welcome to the home page",
@@ -9,14 +15,6 @@ const data = {
     description2: "Texto en español",
     description5: "5This is a sample description for the item list.",
   },
-  imagenes: {
-    image1: {
-      src: "https://persistent.imagedescriber.online/image-describer-examples/000.jpg",
-      alt: "Image 1",
-      order: "order-0",
-    },
-  },
-
   buttons: {
     buton1: {
       label: "button 1",
@@ -30,10 +28,22 @@ const data = {
   },
 };
 
-const dataStyle = {
+const styleItem = {
+  media: {
+    default: {
+      test: "text-gray-900",
+    },
+
+    image1: {
+      order: "order-3",
+      colPosition: 3,
+      class: "img-class",
+    },
+  },
+
   labels: {
     default: {
-      test: "------------------",
+      testttt: "------------------",
       typeTag: "div",
       color: "text-gray-900",
       background: "",
@@ -50,17 +60,15 @@ const dataStyle = {
       fontWeight: "font-semibold",
       background: "bg-red-200",
       order: "order-0",
-      //colStart: "col-start-1",
-      colPosition: "1",
+      colPosition: 1,
     },
     welcome: {
       color: "text-gray-900",
       typeTag: "p",
       size: "text-[20px]",
       fontWeight: "font-semibold",
-      order: "order-1",
-      colStart: "col-start-2",
-      colPosition: "0",
+      order: "order-2",
+      colPosition: 1,
     },
     title: {
       typeTag: "h5",
@@ -71,27 +79,28 @@ const dataStyle = {
       colPosition: 2,
     },
     title2: {
-      color: "text-gray-900",
+      color: "text-red-900",
       background: "bg-red-200",
       size: "text-lg",
       order: "order-3",
       fontWeight: "font-semibold",
-      colPosition: 2,
+      colPosition: 3,
     },
     titleItem: {
       color: "text-gray-900",
       background: "bg-red-200",
       size: "text-lg",
       order: "order-4",
-      // colStart: "col-start-2",
       fontWeight: "font-semibold",
+      colPosition: 3,
     },
     description2: {
       color: "text-gray-900",
       background: "bg-red-200",
       size: "text-lg",
-      order: "order-8",
+      order: "order-4",
       fontWeight: "font-semibold",
+      colPosition: 3,
     },
     description5: {
       color: "text-gray-900",
@@ -99,16 +108,7 @@ const dataStyle = {
       size: "text-lg",
       order: "order-3",
       fontWeight: "font-semibold",
-    },
-  },
-  imagenes: {
-    default: {
-      img: "div",
-      test: "text-gray-900",
-    },
-
-    image1: {
-      order: "order-1",
+      colPosition: 3,
     },
   },
 
@@ -127,24 +127,18 @@ const dataStyle = {
       background: "bg-gray-500 flex-1",
       size: "text-sm",
       fontWeight: "font-semibold",
-
       padding: "p-2",
       hoverColor: "hover:bg-gray-600",
-
       order: "order-5",
-      colStart: "col-start-1",
-      colPosition: "",
+      colPosition: 4,
     },
     buton2: {
       color: "text-white",
-      background: "bg-primary-500",
+      background: "bg-red-500",
       size: "text-sm",
-
       fontWeight: "font-semibold",
-
       order: "order-5",
-      colStart: "col-start-1",
-      colPosition: "2",
+      colPosition: 5,
     },
   },
 };
@@ -152,25 +146,23 @@ const dataStyle = {
 
 
 <template>
-  <div class="grid grid-cols-2 gap-1">
-    <ItemList :item="data" :styleItem="dataStyle" positioniamge="top">
-    </ItemList>
-    <ItemList
-      :item="data"
-      :styleItem="dataStyle"
-      :columnsItem="3"
-      :widthColumn="['w-[33.33%]', 'w-[33.33%]', 'w-[33.33%]']"
-      :styleColum="['item-center', '2', '3']"
-    >
-    </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle" :columnsItem="2"> </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle"> </ItemList>
-
-    <!-- <ItemList :item="data" :styleItem="dataStyle"> </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle"> </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle"> </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle"> </ItemList>
-    <ItemList :item="data" :styleItem="dataStyle"> </ItemList> -->
-  </div>
+  <!-- <div class="grid grid-cols-4 gap-1" v-for="(item, index) in 3" :key="index"> -->
+  <Icard
+    :dataItem="data"
+    :dataStyle="styleItem"
+    :widthColumns="['w-[50%]', 'w-[50%]']"
+    :styleColumn="['item-center', 'item-start', '3']"
+    background="bg-gray-500"
+  ></Icard>
+  <Icard
+    :dataItem="data"
+    :dataStyle="styleItem"
+    :widthColumns="['w-[20%]', 'w-[20%]', 'w-[20%]', 'w-[20%]', 'w-[20%]']"
+    :styleColumn="['item-center', 'justify-center h-100', '3']"
+  >
+  </Icard>
+  <Icard :dataItem="data" :dataStyle="styleItem"> </Icard>
+  <Icard :dataItem="data" :dataStyle="styleItem"> </Icard>
+  <!-- </div> -->
 </template>
 

@@ -34,7 +34,6 @@ const {
   transition,
   textWrap,
   order,
-  colStart= "",
   colPosition = "",
   icon,
 } = props.configComponentText || {};
@@ -55,7 +54,7 @@ const typography = computed(() =>
 );
 
 const positionOrder = computed(() =>
-  [order, colStart, colPosition].filter(Boolean).join(" ")
+  [order, colPosition].filter(Boolean).join(" ")
 );
 
 const spacing = computed(() =>
