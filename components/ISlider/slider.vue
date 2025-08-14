@@ -1,39 +1,46 @@
 <script setup lang="ts">
-import {ref, onMounted, computed} from 'vue'
 import {useWindowSize} from "@vueuse/core"
-import type {sliderProps} from './partials/interfaces';
-import {sliderDefaults} from './partials/interfaces';
+import type {sliderProps} from './partials/interfaces'
+import {sliderDefaults} from './partials/interfaces'
+
 import Thumbs from './partials/thumbs.vue'
-import CsTailwind from "~/utils/csTalwind"
-import Dots from "./partials/dots.vue";
-import Navs from "./partials/navs.vue";
+import Dots from './partials/dots.vue'
+import Navs from './partials/navs.vue'
+import CsTailwind from '~/utils/csTalwind'
 
+/* PROPS & SETUP */
 const defaultProps = withDefaults(defineProps<sliderProps>(), sliderDefaults)
-const props = useMergeData(defaultProps, sliderDefaults) // Merged defaults props with user props used
+const props = useMergeData(defaultProps, sliderDefaults)
 
+const {width} = useWindowSize()
+const isMobile = computed(() => width.value <= 768)
+
+/* REFS */
 const carouselRef = ref(null)
 const itemRefs = ref<HTMLElement[]>([])
-const sliderControls = useEmblaController(carouselRef, props, itemRefs)
-const {width} = useWindowSize();
-const isMobile = computed(() => width.value <= 768);
-// Update item ref
-const setItemRef = (el: HTMLElement | null): any => {
- if (el && !itemRefs.value.includes(el)) {
-  itemRefs.value.push(el)
- }
-}
+const setItemRef = (el: HTMLElement | null) => el && !itemRefs.value.includes(el) && itemRefs.value.push(el)
 
-/* Classes Component */
-const classContainer = computed(() => {
- return props.activeContainer && [props.sizeContainer, 'mx-auto'].filter(Boolean)
-})
+/* EMBLA CONTROLLER */
+const sliderControls = useEmblaController(carouselRef, props, itemRefs)
+
+/* COMPUTED POSITIONS */
+const navsPosition = computed(() => props.navsConfig?.position)
+const dotsPosition = computed(() => props.dotsConfig?.position)
+const verticalNavs = computed(() => navsPosition.value === 'vertical')
+const isIndividualNavs = computed(() => ['sides', 'vertical'].includes(navsPosition.value || ''))
+const topNavs = computed(() => navsPosition.value?.startsWith('top'))
+const bottomNavs = computed(() => navsPosition.value?.startsWith('bottom') || (isIndividualNavs.value && isMobile.value))
+
+/* CLASSES */
+const classContainer = computed(() => [props.sizeContainer, props.activeContainer && 'mx-auto', 'overflow-x-hidden'].filter(Boolean))
 const primaryCarouselClass = computed(() => {
  const isVertical = props.config?.isVertical
- const autoDimensioned = props.config?.autoDimensioned
+ const autoDim = props.config?.autoDimensioned
+
  return [
   'root max-w-screen grid items-center grid-col-12',
-  ((isIndividualNavs.value && !autoDimensioned) && (!isVertical && !verticalNavs.value)) && 'md:grid-cols-[max-content_1fr_max-content]',
-  (((isIndividualNavs.value && autoDimensioned) || isVertical) && !verticalNavs.value) && 'md:grid-cols-[max-content_max-content_max-content] place-content-center'
+  (isIndividualNavs.value && !autoDim && !isVertical && !verticalNavs.value) && 'md:grid-cols-[max-content_1fr_max-content]',
+  ((isIndividualNavs.value && autoDim) || isVertical) && !verticalNavs.value && 'md:grid-cols-[max-content_max-content_max-content] place-content-center'
  ].filter(Boolean)
 })
 const ubicationDotsClass = computed(() => [
@@ -42,54 +49,41 @@ const ubicationDotsClass = computed(() => [
  dotsPosition.value === 'left' && 'md:grid md:grid-cols-[max-content_1fr]'
 ].filter(Boolean))
 const rootClass = computed(() => ['slide-content', props.class?.root].filter(Boolean))
-const viewportClass = computed(() => {
- return [
-  'm-auto viewport',
-  props.config?.isVertical ? 'max-w-max' : 'max-h-max',
-  props.class?.viewport
- ].filter(Boolean)
-})
-const containerCarouselClass = computed(() => {
- return [
-  props.config?.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
-  'slide-container justify-start !m-0',
-  props.class?.container
- ].filter(Boolean)
-})
-const itemClass = computed(() => {
- return [
-  props.config?.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
-  props.item?.class,
-  CsTailwind(props.breakPoint || {}, 'basis-1/').join(' '),
-  'slide !m-0 !p-0'
- ].filter(Boolean)
-})
+const viewportClass = computed(() => [
+ 'm-auto viewport',
+ props.config?.isVertical ? 'max-w-max' : 'max-h-max',
+ props.class?.viewport
+].filter(Boolean))
+const containerCarouselClass = computed(() => [
+ props.config?.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
+ 'slide-container justify-start !m-0',
+ props.class?.container
+].filter(Boolean))
+const itemClass = computed(() => [
+ props.config?.isVertical ? '!items-center ui-v-container' : '!items-start ui-h-container',
+ props.item?.class,
+ CsTailwind(props.breakPoint || {}, 'basis-1/').join(' '),
+ 'slide !m-0 !p-0'
+].filter(Boolean))
 
-// Navs  && Dots
-const navsPosition = computed(() => props.navsConfig?.position)
-const dotsPosition = computed(() => props.dotsConfig?.position)
-const canScrollPrev = computed(() => sliderControls?.canScrollPrev.value ?? false)
-const canScrollNext = computed(() => sliderControls?.canScrollNext.value ?? false)
-const verticalNavs = computed(() => navsPosition.value === 'vertical')
-const isIndividualNavs = computed(() => navsPosition.value === 'sides' || navsPosition.value === 'vertical')
-const topNavs = computed(() => navsPosition.value?.startsWith('top'))
-const bottomNavs = computed(() => navsPosition.value?.startsWith('bottom') || (isIndividualNavs.value && isMobile.value))
-
+/* CONFIG PROPS */
 const propsNavs = computed(() => ({
  scrollNext: sliderControls?.scrollNext,
- canScrollNext: canScrollNext.value,
  scrollPrev: sliderControls?.scrollPrev,
- canScrollPrev: canScrollPrev.value,
- navClass: [...[props.navsConfig?.navClass], verticalNavs.value && 'rotate-90'].filter(Boolean),
- ...props.navsConfig,
+ canScrollNext: sliderControls?.canScrollNext.value ?? false,
+ canScrollPrev: sliderControls?.canScrollPrev.value ?? false,
+ navClass: [props.navsConfig?.navClass, verticalNavs.value && 'rotate-90'].filter(Boolean),
+ ...props.navsConfig
 }))
+
 const propsDots = computed(() => ({
  scrollTo: sliderControls?.scrollTo,
  activeDot: sliderControls?.selectedIndex,
  dots: sliderControls?.scrollSnaps.value || [],
- vertical: (dotsPosition.value === 'right' || dotsPosition.value === 'left') && !isMobile.value,
+ vertical: ['right', 'left'].includes(dotsPosition.value || '') && !isMobile.value,
  ...props.dotsConfig
 }))
+
 const thumbsProps = computed(() => ({
  activeItems: sliderControls.activeIndexes,
  controls: {
@@ -101,135 +95,117 @@ const thumbsProps = computed(() => ({
  sliderConfig: props.thumbsConfig?.sliderConfig
 }))
 
-/// Computed slider configs
-const autoPlayConfig = computed(() => {
- return props.config?.autoPlay ? {
-  direction: props.config?.reverse ? 'backward' : 'forward',
-  delay: props.config?.delay || 3000,
-  stopOnMouseEnter: props.config?.pauseOnHover,
-  stopOnInteraction: !props.config?.pauseOnHover,
-  jump: false
- } : false
-})
-const autoScrollConfig = computed(() => {
- return props.config?.autoScroll ? {
-  direction: props.config?.reverse ? 'backward' : 'forward',
-  stopOnMouseEnter: props.config?.pauseOnHover,
-  stopOnInteraction: !props.config?.pauseOnHover,
-  isPlaying: props.config?.pauseOnHover,
-  speed: props.config?.speed
- } : false
-})
+/* AUTOPLAY / AUTOSCROLL / UI CONFIGS */
+const autoPlayConfig = computed(() =>
+  props.config?.autoPlay ? {
+   direction: props.config.reverse ? 'backward' : 'forward',
+   delay: props.config.delay || 3000,
+   stopOnMouseEnter: props.config.pauseOnHover,
+   stopOnInteraction: !props.config.pauseOnHover,
+   jump: false
+  } : false
+)
+
+const autoScrollConfig = computed(() =>
+  props.config?.autoScroll ? {
+   direction: props.config.reverse ? 'backward' : 'forward',
+   stopOnMouseEnter: props.config.pauseOnHover,
+   stopOnInteraction: !props.config.pauseOnHover,
+   isPlaying: props.config.pauseOnHover,
+   speed: props.config.speed
+  } : false
+)
+
 const uiConfig = computed(() => ({
  root: rootClass.value,
  viewport: viewportClass.value,
  container: containerCarouselClass.value,
- item: itemClass.value,
+ item: itemClass.value
 }))
 
+/* INIT */
 onMounted(async () => {
  await nextTick()
- // Use embla Controller
  sliderControls?.mainController()
-
- // Dimensioned container
  sliderControls?.dimensionerContainer()
-});
+})
 </script>
+
 
 <template>
  <section class="w-full h-auto block">
-  <div :class="[classContainer, 'overflow-x-hidden']">
-   <div :class="[`carousel`, {'vertical': config?.isVertical}]">
+  <div :class="classContainer">
+   <div :class="['carousel', { vertical: config?.isVertical }]">
 
-    <div class="primary-carousel">
+    <!-- NAVS - TOP -->
+    <Navs v-if="withNavs && topNavs" v-bind="propsNavs"/>
 
-     <!-- Navs when they go to top -->
-     <Navs v-if="withNavs && topNavs" v-bind="propsNavs"/>
-     <!-- Navs End -->
+    <!-- MAIN CAROUSEL -->
+    <div :class="primaryCarouselClass">
 
-     <!-- Main Carousel -->
-     <div :class="primaryCarouselClass">
-      <!--Nav Prev (WHEN THEY GO TO SIDES OR VERTICAL) -->
-      <div v-if="withNavs && (isIndividualNavs && ( !isMobile || verticalNavs))"
-           class="shrink-0">
-       <Navs v-bind="propsNavs" :hidden-next="true"/>
+     <!-- NAV - PREV (SINGLE / VERTICAL) -->
+     <div v-if="withNavs && isIndividualNavs && (!isMobile || verticalNavs)" class="shrink-0">
+      <Navs v-bind="propsNavs" :hidden-next="true"/>
+     </div>
+
+     <!-- DOTS & CAROUSEL -->
+     <div :class="ubicationDotsClass">
+
+      <!-- DOTS - TOP / LEFT -->
+      <div v-if="withDots && ['top', 'left'].includes(dotsPosition)" class="shrink-0">
+       <Dots v-bind="propsDots"/>
       </div>
 
-      <div :class="ubicationDotsClass">
-
-       <!--Dots (WHEN SHOW TOP OR LEFT)-->
-       <div v-if="withDots && (dotsPosition === 'top'|| dotsPosition === 'left')" class="shrink-0">
-        <Dots v-bind="propsDots"/>
-       </div>
-
-       <!--Carousel -->
-       <UCarousel
-         :active="isActive"
-         ref="carouselRef"
-         :items="items"
-         v-slot="{ item, index }"
-         v-bind="config"
-         @select="sliderControls?.onSelect"
-         :class-names="{snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')]}"
-         :loop="config?.loop || config?.reverse"
-         :orientation="config?.isVertical ? 'vertical' : 'horizontal'"
-         :wheelGestures="config?.isVertical &&config?. moveWithWheel"
-         :align="config?.centeredItems ? 'center' : 'start'"
-         :slidesToScroll="config?.itemsByTransition"
-         :inViewThreshold="0.6"
-
-         :auto-scroll="autoScrollConfig"
-         :autoplay="autoPlayConfig"
-
-         :arrows="false"
-         :dots="false"
-         :ui="uiConfig"
-
-         :breakpoints="{
-        768: {slidesToScroll: 2},
-        500:{slidesToScroll: 1}
-       }"
+      <!-- CAROUSEL -->
+      <UCarousel
+        ref="carouselRef"
+        :items="items"
+        :active="isActive"
+        v-bind="config"
+        :loop="config?.loop || config?.reverse"
+        :orientation="config?.isVertical ? 'vertical' : 'horizontal'"
+        :wheelGestures="config?.isVertical && config?.moveWithWheel"
+        :align="config?.centeredItems ? 'center' : 'start'"
+        :slidesToScroll="config?.itemsByTransition"
+        :inViewThreshold="0.6"
+        :auto-scroll="autoScrollConfig"
+        :autoplay="autoPlayConfig"
+        :arrows="false"
+        :dots="false"
+        :ui="uiConfig"
+        :breakpoints="{ 768: { slidesToScroll: 2 }, 500: { slidesToScroll: 1 } }"
+        @select="sliderControls?.onSelect"
+        :class-names="{ snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')] }"
+        v-slot="{ item, index }"
+      >
+       <div
+         :ref="setItemRef"
+         v-bind="props.item?.actions"
+         class="content w-full min-w-0 h-full"
+         :class="[config?.autoDimensioned && 'max-w-max', props.item?.padding]"
        >
-        <template v-if="$slots.default">
-         <div
-           :ref="setItemRef"
-           v-bind="props.item?.actions"
-           class="content w-full min-w-0 h-full"
-           :class="[
-             {'max-w-max':config?.autoDimensioned}
-             ,props.item?.padding
-             ]"
-         >
-          <slot :item="item" :index="index"/>
-         </div>
-        </template>
-       </UCarousel>
-
-       <!--Dots (WHEN SHOW BOTTOM OR RIGHT)-->
-       <div v-if="withDots && (dotsPosition === 'bottom' || dotsPosition === 'right')" class="shrink-0">
-        <Dots v-bind="propsDots"/>
+        <slot :item="item" :index="index"/>
        </div>
-      </div>
+      </UCarousel>
 
-      <!--Nav Next (WHEN THEY GO TO SIDES OR VERTICAL) -->
-      <div v-if="withNavs && (isIndividualNavs &&( !isMobile || verticalNavs))"
-           class="shrink-0">
-       <Navs v-bind="propsNavs" :hidden-prev="true"/>
+      <!-- DOTS - BOTTOM / RIGHT -->
+      <div v-if="withDots && ['bottom', 'right'].includes(dotsPosition)" class="shrink-0">
+       <Dots v-bind="propsDots"/>
       </div>
      </div>
-     <!-- Main Carousel  End -->
 
-     <!-- Navs when they go to bottom -->
-     <Navs v-if="withNavs && bottomNavs" v-bind="propsNavs"/>
-     <!-- Navs End -->
-
+     <!-- NAV - NEXT (SINGLE / VERTICAL) -->
+     <div v-if="withNavs && isIndividualNavs && (!isMobile || verticalNavs)" class="shrink-0">
+      <Navs v-bind="propsNavs" :hidden-prev="true"/>
+     </div>
     </div>
 
+    <!-- NAVS - BOTTOM -->
+    <Navs v-if="withNavs && bottomNavs" v-bind="propsNavs"/>
+
+    <!-- THUMBS -->
     <div v-if="withThumbs" class="thumbs-carousel my-4">
-     <!-- Thumbs -->
      <Thumbs :items="items" v-bind="thumbsProps"/>
-     <!-- Thumbs End -->
     </div>
    </div>
   </div>
