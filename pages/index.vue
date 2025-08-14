@@ -33,8 +33,8 @@
 
 <script setup lang="ts">
 
-import Slider from '@/components/slider/slider.vue'
-import ITemC from '@/components/slider/itemC.vue'
+import Slider from '@/components/ISlider/slider.vue'
+import ITemC from '@/components/ISlider/itemC.vue'
 
 const items = [
  {
