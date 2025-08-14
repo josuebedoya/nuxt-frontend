@@ -56,7 +56,7 @@ const slider = computed(() => {
 
 const thumbClass = computed(() => props.sliderConfig?.item?.class ?? 'opacity-30 duration-300 hover:opacity-100')
 const activeThumbClass = computed(() => `thumb-active ${props.sliderConfig?.item?.classActive ?? 'opacity-100'}`)
-const activeThumbsIndexes = computed(() => props.activeItems?.value || [])
+const activeThumbsIndexes = computed(() => props.activeItems || [])
 </script>
 
 <template>
