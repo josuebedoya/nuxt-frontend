@@ -25,7 +25,7 @@ interface navProps {
 
 const props = withDefaults(defineProps<navProps>(), {
  hiddenNext: false,
- hiddenNext: false,
+ hiddenPrev: false,
  canScrollPrev: false,
  canScrollNext: false,
  position: 'bottom-center',
