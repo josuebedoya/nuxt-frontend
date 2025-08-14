@@ -32,7 +32,7 @@ const topNavs = computed(() => navsPosition.value?.startsWith('top'))
 const bottomNavs = computed(() => navsPosition.value?.startsWith('bottom') || (isIndividualNavs.value && isMobile.value))
 
 /* CLASSES */
-const classContainer = computed(() => [props.sizeContainer, props.activeContainer && 'mx-auto', 'overflow-x-hidden'].filter(Boolean))
+const classContainer = computed(() => [props.activeContainer && props.sizeContainer, 'overflow-x-hidden mx-auto'].filter(Boolean))
 const primaryCarouselClass = computed(() => {
  const isVertical = props.config?.isVertical
  const autoDim = props.config?.autoDimensioned
@@ -178,14 +178,16 @@ onMounted(async () => {
         :class-names="{ snapped: '', inView: ['active', ...props.item?.classActive?.split(' ')] }"
         v-slot="{ item, index }"
       >
-       <div
-         :ref="setItemRef"
-         v-bind="props.item?.actions"
-         class="content w-full min-w-0 h-full"
-         :class="[config?.autoDimensioned && 'max-w-max', props.item?.padding]"
-       >
-        <slot :item="item" :index="index"/>
-       </div>
+       <template v-if="$slots.default">
+        <div
+          :ref="setItemRef"
+          v-bind="props.item?.actions"
+          class="content w-full min-w-0 h-full"
+          :class="[config?.autoDimensioned && 'max-w-max', props.item?.padding]"
+        >
+         <slot :item="item" :index="index"/>
+        </div>
+       </template>
       </UCarousel>
 
       <!-- DOTS - BOTTOM / RIGHT -->
