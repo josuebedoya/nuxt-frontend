@@ -1,0 +1,43 @@
+# EditorConfig helps developers define and maintain consistent coding styles
+# https://editorconfig.org
+
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Use 2 spaces for indentation (JS/TS/Vue standard)
+indent_style = space
+indent_size = 2
+
+# JSON, YAML, and config files
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown (don’t trim trailing whitespace — needed for line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefile (must use tabs)
+[Makefile]
+indent_style = tab
+
+# Vue Single File Components
+[*.vue]
+indent_style = space
+indent_size = 2
+
+# CSS, SCSS, and PostCSS
+[*.{css,scss,postcss}]
+indent_style = space
+indent_size = 2
+
+# HTML and template files
+[*.{html,htm}]
+indent_style = space
+indent_size = 2
