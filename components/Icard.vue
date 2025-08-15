@@ -6,7 +6,7 @@
 ==========================================
 
 <Icard
-  :data-item="{
+  :item="{
     media: {
       logo: 'https://example.com/logo.png',
       banner: {
@@ -34,7 +34,7 @@
       }
     }
   }"
-  :data-style="{
+  :item-style="{
     media: {
       default: { colPosition: 1, class: 'w-full mb-4' },
       logo: { colPosition: 1, class: 'w-16 h-16 rounded-full' },
@@ -66,7 +66,7 @@
 📊 DATA STRUCTURE EXPLANATION
 ==========================================
 
-dataItem: {
+item: {
   media: {
     [key]: string | { src: string, alt?: string }
   },
@@ -78,7 +78,7 @@ dataItem: {
   }
 }
 
-dataStyle: {
+itemStyle: {
   [section]: {
     default?: { colPosition?: number, class?: string, [prop]: any },
     [itemKey]?: { colPosition?: number, class?: string, [prop]: any }
@@ -104,8 +104,8 @@ If colPosition is not specified or invalid, defaults to column 1.
 3. Component default classes (lowest priority)
 
 Example:
-dataStyle.labels.title.class = "text-xl font-bold" (wins)
-dataStyle.labels.default.class = "text-base" (fallback)
+itemStyle.labels.title.class = "text-xl font-bold" (wins)
+itemStyle.labels.default.class = "text-base" (fallback)
  *
  */
 
@@ -117,12 +117,12 @@ dataStyle.labels.default.class = "text-base" (fallback)
 // Component props
 const props = defineProps({
   // Main data object containing items to render
-  dataItem: {
+  item: {
     type: Object,
     required: true,
   },
   // Style configuration for sections
-  dataStyle: {
+  itemStyle: {
     type: Object,
     required: false,
   },
@@ -265,9 +265,9 @@ const columnsData = computed<ColumnData[]>(() => {
   }
 
   // Process each section
-  assignToColumn("media", props.dataItem.media, props.dataStyle?.media);
-  assignToColumn("labels", props.dataItem.labels, props.dataStyle?.labels);
-  assignToColumn("buttons", props.dataItem.buttons, props.dataStyle?.buttons);
+  assignToColumn("media", props.item.media, props.itemStyle?.media);
+  assignToColumn("labels", props.item.labels, props.itemStyle?.labels);
+  assignToColumn("buttons", props.item.buttons, props.itemStyle?.buttons);
 
   return cols;
 });
@@ -301,19 +301,20 @@ const columnsData = computed<ColumnData[]>(() => {
             :key="img.key"
             :class="['image-componet', img.styleClasses]"
           ></div>
+
+          <div
+            v-for="img in col.media"
+            :key="img.key"
+            :class="['image-componet', img.styleClasses]"
+          >
+            <img
+              :src="img.value.src || img.value"
+              :alt="img.value.alt || ''"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
         </template>
-        <div
-          v-for="img in col.media"
-          :key="img.key"
-          :class="['image-componet', img.styleClasses]"
-        >
-          <img
-            :src="img.value.src || img.value"
-            :alt="img.value.alt || ''"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
 
         <!-- Label items -->
         <template v-if="col.labels.length > 0">

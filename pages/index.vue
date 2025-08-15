@@ -1,4 +1,6 @@
 <script setup>
+import Icard from "~/components/Icard.vue";
+
 const data = {
   media: {
     image1: {
@@ -33,7 +35,6 @@ const styleItem = {
     default: {
       test: "text-gray-900",
     },
-
     image1: {
       order: "order-3",
       colPosition: 3,
@@ -142,27 +143,66 @@ const styleItem = {
     },
   },
 };
+
+const dataList = [
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+  data,
+];
 </script>
 
 
 <template>
   <!-- <div class="grid grid-cols-4 gap-1" v-for="(item, index) in 3" :key="index"> -->
-  <Icard
-    :dataItem="data"
+
+  <IList
+    :component="Icard"
+    :data="dataList"
+    layout="grid"
+    gap="2"
+    :componentProps="{
+      itemStyle: styleItem,
+      padding: 'p-4',
+      margin: '',
+    }"
+  />
+
+  <div>---------------------------------</div>
+
+  <!-- <Icard
+    :item="data"
     :dataStyle="styleItem"
     :widthColumns="['w-[50%]', 'w-[50%]']"
     :styleColumn="['item-center', 'item-start', '3']"
     background="bg-gray-500"
-  ></Icard>
-  <Icard
-    :dataItem="data"
+  ></Icard> -->
+  <!-- <Icard
+    :item="data"
     :dataStyle="styleItem"
     :widthColumns="['w-[20%]', 'w-[20%]', 'w-[20%]', 'w-[20%]', 'w-[20%]']"
     :styleColumn="['item-center', 'justify-center h-100', '3']"
   >
-  </Icard>
-  <Icard :dataItem="data" :dataStyle="styleItem"> </Icard>
-  <Icard :dataItem="data" :dataStyle="styleItem"> </Icard>
+  </Icard> -->
+  <!-- <Icard :item="data" :dataStyle="styleItem"> </Icard> -->
+  <!-- <Icard :item="data" :dataStyle="styleItem"> </Icard> -->
   <!-- </div> -->
 </template>
 
