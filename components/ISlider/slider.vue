@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useWindowSize} from "@vueuse/core"
-import type {sliderProps} from './partials/interfaces'
-import {sliderDefaults} from './partials/interfaces'
+import type {sliderProps} from '@/types/components/slider'
+import {sliderDefaults} from '@/types/components/slider'
 
 import Thumbs from './partials/thumbs.vue'
 import Dots from './partials/dots.vue'
