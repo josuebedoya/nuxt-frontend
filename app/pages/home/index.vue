@@ -1,5 +1,7 @@
 <template>
   <!-- H1 -->
+  <main-slider/>
+  <!-- H1 -->
   <main-text/>
   <!-- Form Vehiculo -->
   <section>
@@ -33,10 +35,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { textH1, cart, titlesCart, infoRent, useBreakpoints } from '~/composables/useConfig.js'
+import { computed } from 'vue'
+import { cart, titlesCart, useBreakpoints } from '~/composables/useConfig.js'
 import MainText from "~/pages/home/sections/mainText.vue";
 import Info from "~/pages/home/sections/info.vue";
+import MainSlider from "~/pages/home/sections/mainSlider.vue";
 
 definePageMeta( {
   layout: 'master'
