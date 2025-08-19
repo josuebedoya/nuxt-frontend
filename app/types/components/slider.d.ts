@@ -45,7 +45,7 @@ export interface sliderProps {
     withNavs?: boolean
     withDots?: boolean
     navsConfig?: Record<string, string | string[] | Record<string, boolean>>
-    dotsConfig?: Record<string, string | string[]>
+    dotsConfig?: Record<string, string | string[] | Record<string, boolean>>
     withThumbs?: boolean
     thumbsConfig?: configThumbs
     item?: configSlide
