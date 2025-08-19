@@ -8,6 +8,7 @@ interface DotsProps {
  activeDot: number | { value: number };
  vertical?: boolean;
  dotClass?: string | string[] | Record<string, boolean>;
+ dotClassActive?: string | string[] | Record<string, boolean>;
  size?: string;
  variant?: 'outline' | 'solid';
  type?: 'square' | 'rounded' | 'bars';
@@ -67,7 +68,9 @@ const indexActive = computed(() => {
      class="cursor-pointer max-[768px]:text-[10px] transition-all"
      :aria-label="`slide ${index + 1}`"
      v-bind="dotProps"
-     :class="[classDot, { active: indexActive === index }]"
+     :class="[classDot,
+     { active: indexActive === index },
+     { [dotClassActive]: indexActive === index }]"
      :data-state="indexActive === index ? 'active' : undefined"
      @click="scrollTo(index)"
    >
