@@ -91,7 +91,7 @@ const propsDots = computed(() => ({
  scrollTo: sliderControls?.scrollTo,
  activeDot: sliderControls?.selectedIndex,
  dots: sliderControls?.scrollSnaps.value || [],
- vertical: ['right', 'left'].includes(dotsPosition.value || '') && !isMobile.value,
+ vertical: ['right', 'left'].includes(dotsPosition.value || '') && (!isMobile.value || dotsInContent.value),
  ...props.dotsConfig
 }))
 
